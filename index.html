@@ -643,8 +643,12 @@ body {
   font-family: monospace;
   font-size: 1.1rem;
   word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
   color: var(--text);
   transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .modal-btns {
@@ -814,6 +818,8 @@ body {
     margin: 0;
     width: 90vw;
     max-height: 65vh;
+    position: fixed;
+    z-index: 10000;
   }
   
   .theme-dropdown.flipped-left,
@@ -831,6 +837,37 @@ body {
   .see-all-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   .modal-btn { min-height: 56px; font-size: 1.2rem; }
   .about-content { font-size: 0.9rem; }
+  
+  /* Mobile-specific modal close button styling */
+  .modal-close {
+    top: 10px;
+    right: 15px;
+    font-size: 1.2rem;
+    padding: 8px 16px;
+    min-width: auto;
+    min-height: 40px;
+    background: var(--btn-gradient-start);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    color: var(--text);
+  }
+  
+  .modal-close::before {
+    content: "Hide";
+  }
+  
+  .modal-close > * {
+    display: none;
+  }
+  
+  .email-display {
+    font-size: 0.95rem;
+    padding: 12px 15px;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
 }
 
 @media (max-width: 480px) {
@@ -839,6 +876,12 @@ body {
   .action-btn { min-width: 110px; font-size: 0.9rem; padding: 10px 14px; }
   .theme-option { padding: 12px 14px; font-size: 0.9rem; }
   .theme-swatch { width: 24px; height: 24px; }
+  
+  .modal-close {
+    font-size: 1.1rem;
+    padding: 6px 14px;
+    min-height: 38px;
+  }
 }
 
 /* Hide scrollbar but keep functionality */
@@ -921,7 +964,7 @@ body {
       
       <div class="about-section">
         <h4>🎯 Why We Created This</h4>
-        <p>We built this beautiful sliding card interface to give everyone <strong>easy, one-click access</strong> to all major social media platforms in one place. Home To Social Media</p>
+        <p>We built this beautiful sliding card interface to give everyone <strong>easy, one-click access</strong> to all major social media platforms in one place. No more searching, no more confusion — just tap and go!</p>
         <div class="about-highlight">
           🌍 Made with love for the global community. Free forever.
         </div>
@@ -954,9 +997,9 @@ body {
 
       <div class="about-section">
         <h4>💬 Questions or Updates?</h4>
-        <p>We welcome your feedback, If you want include your social media, message us, we welcome you. If you notice anything that needs attention, have suggestions for new platforms, or just want to say hello, we'd love to hear from you.</p>
+        <p>We welcome your feedback! If you notice anything that needs attention, have suggestions for new platforms, or just want to say hello — we'd love to hear from you.</p>
         <div class="about-highlight">
-          📧 Us Am Here To Help, Feel Good To Reach Us anytime: <strong>olusolaayodeji5112@gmail.com</strong>
+          📧 Reach out anytime: <strong>olusolaayodeji5112@gmail.com</strong>
         </div>
       </div>
 
@@ -964,9 +1007,9 @@ body {
     
     <div class="about-footer">
       <p style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">
-        🚀 We're excited to share this with the world
+        🚀 We're excited to share this with the world!
       </p>
-      <p>Thank you for using our social media directory. Browse with confidence.</p>
+      <p>Thank you for using our verified social media directory. Browse with confidence.</p>
       <button class="modal-btn direct" id="aboutContactBtn" style="margin-top: 10px;">
         <span>✉️</span> Contact Us
       </button>
