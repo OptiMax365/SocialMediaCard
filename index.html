@@ -7,17 +7,24 @@
 
 <style>
 :root {
-  /* DEFAULT THEME: Emerald Green */
+  /* DEFAULT THEME: Emerald Green - ALL VALUES DYNAMIC */
   --bg: #02110b;
   --card-bg: #062416;
+  --card-gradient-start: rgba(9,61,35,0.95);
+  --card-gradient-end: rgba(2,18,12,0.98);
   --accent: #1ee66f;
   --text: #eafff2;
   --border: #195135;
   --popup-bg: rgba(2, 18, 12, 0.98);
+  --btn-gradient-start: rgba(7,45,28,0.95);
+  --btn-gradient-end: rgba(2,20,13,0.98);
   --btn-hover: rgba(20,120,60,0.98);
+  --action-btn-bg: rgba(7,45,28,0.95);
+  --theme-option-bg: rgba(7,45,28,0.4);
   --glow-soft: rgba(30,230,111,0.2);
   --glow-medium: rgba(30,230,111,0.4);
   --glow-strong: rgba(30,230,111,0.7);
+  --card-glow-overlay: rgba(30,230,111,0.02);
 }
 
 * {
@@ -26,7 +33,7 @@
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
-  touch-action: pan-y;
+  touch-action: manipulation;
 }
 
 body {
@@ -70,7 +77,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(9,61,35,0.95), rgba(2,18,12,0.98));
+  background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
   border-right: 1px solid rgba(60,150,100,0.28);
   position: relative;
   overflow: hidden;
@@ -82,7 +89,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--glow-soft), transparent, rgba(30,230,111,0.02));
+  background: linear-gradient(135deg, var(--glow-soft), transparent, var(--card-glow-overlay));
   pointer-events: none;
   transition: background 0.4s ease;
 }
@@ -122,7 +129,7 @@ body {
   font-weight: 600;
   color: white;
   text-decoration: none;
-  background: linear-gradient(90deg, rgba(7,45,28,0.95), rgba(2,20,13,0.98));
+  background: linear-gradient(90deg, var(--btn-gradient-start), var(--btn-gradient-end));
   border: 2px solid var(--glow-medium);
   border-radius: 24px;
   cursor: pointer;
@@ -132,6 +139,7 @@ body {
   min-width: 300px;
   text-align: center;
   user-select: auto;
+  touch-action: manipulation;
 }
 
 .social-btn:hover {
@@ -140,6 +148,10 @@ body {
   border-color: var(--accent);
   box-shadow: 0 0 40px var(--glow-medium), 0 0 80px var(--glow-soft), inset 0 0 30px var(--glow-soft);
   color: white;
+}
+
+.social-btn:active {
+  transform: translateY(-2px) scale(1.02);
 }
 
 /* === CARD ACTION BUTTONS (Left Side) === */
@@ -163,7 +175,7 @@ body {
 }
 
 .action-btn {
-  background: linear-gradient(90deg, rgba(7,45,28,0.95), rgba(2,20,13,0.98));
+  background: linear-gradient(90deg, var(--btn-gradient-start), var(--btn-gradient-end));
   border: 2px solid var(--glow-medium);
   border-radius: 16px;
   padding: 12px 20px;
@@ -173,10 +185,13 @@ body {
   cursor: pointer;
   transition: all 0.25s ease;
   min-width: 140px;
+  min-height: 44px; /* Mobile touch target */
   text-align: center;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  touch-action: manipulation;
 }
 
 .action-btn:hover {
@@ -186,6 +201,170 @@ body {
   background: var(--btn-hover);
 }
 
+.action-btn:active {
+  transform: translateX(2px) scale(0.98);
+}
+
+/* Theme Picker Dropdown */
+.theme-picker-wrapper {
+  position: relative;
+}
+
+.theme-picker-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.theme-dropdown {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 10px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 15px;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+  max-width: 90vw;
+  max-height: 55vh;  /* ← Changed from 70vh to 55vh */
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 100;
+  box-shadow: 0 0 30px var(--glow-medium);
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: left center;
+}
+
+.theme-dropdown.show {
+  display: flex;
+  animation: dropdownAppear 0.2s ease-out;
+}
+
+@keyframes dropdownAppear {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Flipped positioning for right edge */
+.theme-dropdown.flipped-left {
+  left: auto;
+  right: 100%;
+  margin-left: 0;
+  margin-right: 10px;
+  transform-origin: right center;
+}
+
+/* Adjusted for bottom edge */
+.theme-dropdown.flipped-top {
+  top: auto;
+  bottom: 0;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: var(--theme-option-bg);
+  min-height: 44px; /* Mobile touch target */
+  touch-action: manipulation;
+}
+
+.theme-option:hover,
+.theme-option.selected {
+  border-color: var(--accent);
+  background: var(--btn-hover);
+  box-shadow: 0 0 15px var(--glow-medium);
+}
+
+.theme-option:active {
+  transform: scale(0.98);
+}
+
+.theme-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+}
+
+.theme-name {
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: color 0.4s ease;
+  flex: 1;
+}
+
+.theme-option.active .theme-swatch {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--glow-medium);
+}
+
+.theme-option.selected .theme-swatch {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 15px var(--glow-strong);
+  transform: scale(1.1);
+}
+
+/* Apply & Cancel Buttons */
+.theme-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.theme-apply-btn,
+.theme-cancel-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+  min-height: 44px; /* Mobile touch target */
+  touch-action: manipulation;
+}
+
+.theme-apply-btn {
+  background: linear-gradient(90deg, var(--accent), var(--border));
+  color: var(--bg);
+}
+
+.theme-apply-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px var(--glow-medium);
+  filter: brightness(1.1);
+}
+
+.theme-apply-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.theme-cancel-btn {
+  background: var(--action-btn-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.theme-cancel-btn:hover {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+}
+
+.theme-cancel-btn:active {
+  transform: scale(0.98);
+}
 
 /* === VERIFICATION BADGE === */
 .verified-badge {
@@ -235,7 +414,7 @@ body {
 }
 
 .checklist-item {
-  background: rgba(7,45,28,0.6);
+  background: var(--theme-option-bg);
   border: 1px solid var(--glow-soft);
   border-radius: 12px;
   padding: 16px;
@@ -284,12 +463,19 @@ body {
   border-radius: 20px;
   border: 1px solid var(--glow-medium);
   transition: all 0.2s ease;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .proof-link:hover {
   background: var(--btn-hover);
   transform: translateY(-2px);
   border-color: var(--accent);
+}
+
+.proof-link:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .update-note {
@@ -311,7 +497,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(2, 18, 12, 0.95);
+  background: var(--popup-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,9 +537,16 @@ body {
   cursor: pointer;
   opacity: 0.7;
   transition: opacity 0.2s, color 0.4s ease;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
 }
 
 .modal-close:hover { opacity: 1; color: var(--accent); }
+.modal-close:active { transform: scale(0.9); }
 
 .modal-title {
   font-size: 1.8rem;
@@ -364,7 +557,7 @@ body {
 }
 
 .email-display {
-  background: rgba(7,45,28,0.8);
+  background: var(--theme-option-bg);
   border: 1px solid var(--glow-medium);
   border-radius: 12px;
   padding: 15px 20px;
@@ -394,10 +587,12 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  min-height: 48px; /* Mobile touch target */
+  touch-action: manipulation;
 }
 
 .modal-btn.copy {
-  background: linear-gradient(90deg, rgba(7,45,28,0.95), rgba(2,20,13,0.98));
+  background: linear-gradient(90deg, var(--btn-gradient-start), var(--btn-gradient-end));
   border: 2px solid var(--glow-medium);
   color: var(--text);
 }
@@ -407,6 +602,10 @@ body {
   border-color: var(--accent);
   transform: translateY(-3px);
   box-shadow: 0 0 25px var(--glow-medium);
+}
+
+.modal-btn.copy:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .modal-btn.direct {
@@ -419,6 +618,10 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 0 30px var(--glow-medium);
   filter: brightness(1.1);
+}
+
+.modal-btn.direct:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .copy-feedback {
@@ -443,12 +646,16 @@ body {
 }
 
 .see-all-item {
-  background: rgba(7,45,28,0.7);
+  background: var(--theme-option-bg);
   border: 1px solid var(--glow-soft);
   border-radius: 14px;
   padding: 14px;
   text-align: center;
   transition: all 0.25s ease;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .see-all-item:hover {
@@ -456,6 +663,10 @@ body {
   background: var(--btn-hover);
   transform: translateY(-3px);
   box-shadow: 0 0 20px var(--glow-medium);
+}
+
+.see-all-item:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .see-all-item a {
@@ -501,25 +712,90 @@ body {
 /* === MOBILE OPTIMIZATIONS === */
 @media (max-width: 768px) {
   .social-title { font-size: clamp(2.5rem, 8vw, 4rem); margin-bottom: 40px; }
-  .social-btn { padding: 18px 40px; font-size: 1.2rem; min-width: 260px; }
-  .card-actions { left: 15px; }
-  .action-btn { padding: 10px 16px; font-size: 0.95rem; min-width: 120px; }
+  .social-btn { 
+    padding: 18px 40px; 
+    font-size: 1.2rem; 
+    min-width: 260px;
+    min-height: 56px; /* Larger touch target */
+  }
+  .card-actions { 
+    left: 15px;
+    gap: 10px;
+  }
+  .action-btn { 
+    padding: 10px 16px; 
+    font-size: 0.95rem; 
+    min-width: 120px;
+    min-height: 48px;
+  }
+  
+  /* Smart dropdown positioning for mobile */
+/* Smart dropdown positioning for mobile */
+.theme-dropdown {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  width: 90vw;
+  max-height: 65vh;  /* ← Changed from 80vh to 65vh */
+}
+
+
+  .theme-dropdown.flipped-left,
+  .theme-dropdown.flipped-top {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+  }
+  
   .checklist-card { padding: 20px 15px; }
   .checklist-grid { grid-template-columns: 1fr; }
   .modal-content { padding: 25px 20px; }
   .modal-title { font-size: 1.5rem; }
   .see-all-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  
+  /* Ensure modals are touch-friendly */
+  .modal-btn { min-height: 56px; font-size: 1.2rem; }
 }
 
-/* Hide scrollbar */
+/* Extra small screens */
+@media (max-width: 480px) {
+  .social-title { font-size: clamp(2rem, 7vw, 3.5rem); }
+  .social-btn { min-width: 240px; padding: 16px 32px; font-size: 1.1rem; }
+  .action-btn { min-width: 110px; font-size: 0.9rem; padding: 10px 14px; }
+  .theme-option { padding: 12px 14px; font-size: 0.9rem; }
+  .theme-swatch { width: 24px; height: 24px; }
+}
+
+/* Hide scrollbar but keep functionality */
 .carousel-container::-webkit-scrollbar { display: none; }
 .carousel-container { -ms-overflow-style: none; scrollbar-width: none; }
 .see-all-grid::-webkit-scrollbar { width: 6px; }
-.see-all-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.see-all-grid::-webkit-scrollbar-thumb { 
+  background: var(--border); 
+  border-radius: 3px;
+}
+.see-all-grid::-webkit-scrollbar-track { background: transparent; }
 
-/* Prevent text selection */
+/* Prevent text selection on interactive elements */
 .social-card { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-.social-btn, .action-btn, .modal-btn { -webkit-user-select: auto; -moz-user-select: auto; -ms-user-select: auto; user-select: auto; }
+.social-btn, .action-btn, .modal-btn, .theme-option, .proof-link { 
+  -webkit-user-select: auto; 
+  -moz-user-select: auto; 
+  -ms-user-select: auto; 
+  user-select: auto; 
+}
+
+/* Focus styles for accessibility */
+.social-btn:focus-visible,
+.action-btn:focus-visible,
+.modal-btn:focus-visible,
+.theme-option:focus-visible,
+.modal-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 </style>
 </head>
 
@@ -534,7 +810,7 @@ body {
 <!-- Email Popup Modal -->
 <div class="modal-overlay" id="emailModal">
   <div class="modal-content">
-    <button class="modal-close" id="emailModalClose">&times;</button>
+    <button class="modal-close" id="emailModalClose" aria-label="Close modal">&times;</button>
     <h3 class="modal-title">Contact Creator</h3>
     <div class="email-display" id="emailDisplay">olusolaayodeji5112@gmail.com</div>
     <div class="modal-btns">
@@ -552,7 +828,7 @@ body {
 <!-- See All Modal -->
 <div class="modal-overlay" id="seeAllModal">
   <div class="modal-content" style="max-width: 900px; width: 95%;">
-    <button class="modal-close" id="seeAllModalClose">&times;</button>
+    <button class="modal-close" id="seeAllModalClose" aria-label="Close modal">&times;</button>
     <h3 class="modal-title">All Social Media Platforms</h3>
     <div class="see-all-grid" id="seeAllGrid">
       <!-- Items injected by JS -->
@@ -645,6 +921,250 @@ const socialMedia = [
   { name: "Second1st", url: "https://second1st.com" }
 ];
 
+// === 12 PRE-DEFINED THEMES - FULL COLOR TEMPLATES ===
+const themes = {
+  emerald: { 
+    name: "Emerald Green", 
+    bg: "#02110b", 
+    cardBg: "#062416", 
+    cardGradientStart: "rgba(9,61,35,0.95)",
+    cardGradientEnd: "rgba(2,18,12,0.98)",
+    accent: "#1ee66f", 
+    text: "#eafff2", 
+    border: "#195135", 
+    popupBg: "rgba(2,18,12,0.98)", 
+    btnGradientStart: "rgba(7,45,28,0.95)",
+    btnGradientEnd: "rgba(2,20,13,0.98)",
+    btnHover: "rgba(20,120,60,0.98)", 
+    actionBtnBg: "rgba(7,45,28,0.95)",
+    themeOptionBg: "rgba(7,45,28,0.4)",
+    glowSoft: "rgba(30,230,111,0.2)", 
+    glowMedium: "rgba(30,230,111,0.4)", 
+    glowStrong: "rgba(30,230,111,0.7)",
+    cardGlowOverlay: "rgba(30,230,111,0.02)"
+  },
+  ocean: { 
+    name: "Ocean Blue", 
+    bg: "#020b11", 
+    cardBg: "#061624", 
+    cardGradientStart: "rgba(9,35,61,0.95)",
+    cardGradientEnd: "rgba(2,11,18,0.98)",
+    accent: "#3db4f2", 
+    text: "#e6f4ff", 
+    border: "#193551", 
+    popupBg: "rgba(2,11,18,0.98)", 
+    btnGradientStart: "rgba(7,28,45,0.95)",
+    btnGradientEnd: "rgba(2,13,20,0.98)",
+    btnHover: "rgba(20,60,120,0.98)", 
+    actionBtnBg: "rgba(7,28,45,0.95)",
+    themeOptionBg: "rgba(7,28,45,0.4)",
+    glowSoft: "rgba(61,180,242,0.2)", 
+    glowMedium: "rgba(61,180,242,0.4)", 
+    glowStrong: "rgba(61,180,242,0.7)",
+    cardGlowOverlay: "rgba(61,180,242,0.02)"
+  },
+  sunset: { 
+    name: "Sunset Orange", 
+    bg: "#110802", 
+    cardBg: "#241206", 
+    cardGradientStart: "rgba(61,35,9,0.95)",
+    cardGradientEnd: "rgba(18,8,2,0.98)",
+    accent: "#ff6b35", 
+    text: "#fff2e6", 
+    border: "#513019", 
+    popupBg: "rgba(18,8,2,0.98)", 
+    btnGradientStart: "rgba(45,28,7,0.95)",
+    btnGradientEnd: "rgba(20,13,2,0.98)",
+    btnHover: "rgba(120,60,20,0.98)", 
+    actionBtnBg: "rgba(45,28,7,0.95)",
+    themeOptionBg: "rgba(45,28,7,0.4)",
+    glowSoft: "rgba(255,107,53,0.2)", 
+    glowMedium: "rgba(255,107,53,0.4)", 
+    glowStrong: "rgba(255,107,53,0.7)",
+    cardGlowOverlay: "rgba(255,107,53,0.02)"
+  },
+  royal: { 
+    name: "Royal Purple", 
+    bg: "#0b0211", 
+    cardBg: "#160624", 
+    cardGradientStart: "rgba(35,9,61,0.95)",
+    cardGradientEnd: "rgba(11,2,18,0.98)",
+    accent: "#9d4edd", 
+    text: "#f2e6ff", 
+    border: "#351951", 
+    popupBg: "rgba(11,2,18,0.98)", 
+    btnGradientStart: "rgba(28,7,45,0.95)",
+    btnGradientEnd: "rgba(13,2,20,0.98)",
+    btnHover: "rgba(60,20,120,0.98)", 
+    actionBtnBg: "rgba(28,7,45,0.95)",
+    themeOptionBg: "rgba(28,7,45,0.4)",
+    glowSoft: "rgba(157,78,221,0.2)", 
+    glowMedium: "rgba(157,78,221,0.4)", 
+    glowStrong: "rgba(157,78,221,0.7)",
+    cardGlowOverlay: "rgba(157,78,221,0.02)"
+  },
+  cyber: { 
+    name: "Cyber Pink", 
+    bg: "#11020a", 
+    cardBg: "#24061a", 
+    cardGradientStart: "rgba(61,9,35,0.95)",
+    cardGradientEnd: "rgba(18,2,11,0.98)",
+    accent: "#ff00aa", 
+    text: "#ffe6f4", 
+    border: "#51193a", 
+    popupBg: "rgba(18,2,11,0.98)", 
+    btnGradientStart: "rgba(45,7,28,0.95)",
+    btnGradientEnd: "rgba(20,2,13,0.98)",
+    btnHover: "rgba(120,20,80,0.98)", 
+    actionBtnBg: "rgba(45,7,28,0.95)",
+    themeOptionBg: "rgba(45,7,28,0.4)",
+    glowSoft: "rgba(255,0,170,0.2)", 
+    glowMedium: "rgba(255,0,170,0.4)", 
+    glowStrong: "rgba(255,0,170,0.7)",
+    cardGlowOverlay: "rgba(255,0,170,0.02)"
+  },
+  golden: { 
+    name: "Golden Yellow", 
+    bg: "#110d02", 
+    cardBg: "#241e06", 
+    cardGradientStart: "rgba(61,51,9,0.95)",
+    cardGradientEnd: "rgba(18,14,2,0.98)",
+    accent: "#ffd700", 
+    text: "#fffde6", 
+    border: "#514519", 
+    popupBg: "rgba(18,14,2,0.98)", 
+    btnGradientStart: "rgba(45,38,7,0.95)",
+    btnGradientEnd: "rgba(20,17,2,0.98)",
+    btnHover: "rgba(120,100,20,0.98)", 
+    actionBtnBg: "rgba(45,38,7,0.95)",
+    themeOptionBg: "rgba(45,38,7,0.4)",
+    glowSoft: "rgba(255,215,0,0.2)", 
+    glowMedium: "rgba(255,215,0,0.4)", 
+    glowStrong: "rgba(255,215,0,0.7)",
+    cardGlowOverlay: "rgba(255,215,0,0.02)"
+  },
+  crimson: { 
+    name: "Crimson Red", 
+    bg: "#110204", 
+    cardBg: "#24060a", 
+    cardGradientStart: "rgba(61,9,15,0.95)",
+    cardGradientEnd: "rgba(18,2,4,0.98)",
+    accent: "#e63946", 
+    text: "#ffe6e8", 
+    border: "#51191f", 
+    popupBg: "rgba(18,2,4,0.98)", 
+    btnGradientStart: "rgba(45,7,11,0.95)",
+    btnGradientEnd: "rgba(20,2,4,0.98)",
+    btnHover: "rgba(120,20,30,0.98)", 
+    actionBtnBg: "rgba(45,7,11,0.95)",
+    themeOptionBg: "rgba(45,7,11,0.4)",
+    glowSoft: "rgba(230,57,70,0.2)", 
+    glowMedium: "rgba(230,57,70,0.4)", 
+    glowStrong: "rgba(230,57,70,0.7)",
+    cardGlowOverlay: "rgba(230,57,70,0.02)"
+  },
+  teal: { 
+    name: "Teal Cyan", 
+    bg: "#021111", 
+    cardBg: "#062424", 
+    cardGradientStart: "rgba(9,61,61,0.95)",
+    cardGradientEnd: "rgba(2,18,18,0.98)",
+    accent: "#00d4d4", 
+    text: "#e6ffff", 
+    border: "#195151", 
+    popupBg: "rgba(2,18,18,0.98)", 
+    btnGradientStart: "rgba(7,45,45,0.95)",
+    btnGradientEnd: "rgba(2,20,20,0.98)",
+    btnHover: "rgba(20,120,120,0.98)", 
+    actionBtnBg: "rgba(7,45,45,0.95)",
+    themeOptionBg: "rgba(7,45,45,0.4)",
+    glowSoft: "rgba(0,212,212,0.2)", 
+    glowMedium: "rgba(0,212,212,0.4)", 
+    glowStrong: "rgba(0,212,212,0.7)",
+    cardGlowOverlay: "rgba(0,212,212,0.02)"
+  },
+  lavender: { 
+    name: "Lavender", 
+    bg: "#0a0611", 
+    cardBg: "#1a1224", 
+    cardGradientStart: "rgba(26,18,45,0.95)",
+    cardGradientEnd: "rgba(11,8,18,0.98)",
+    accent: "#b19cd9", 
+    text: "#f0e6ff", 
+    border: "#3a2a51", 
+    popupBg: "rgba(11,8,18,0.98)", 
+    btnGradientStart: "rgba(20,15,35,0.95)",
+    btnGradientEnd: "rgba(13,10,22,0.98)",
+    btnHover: "rgba(80,60,120,0.98)", 
+    actionBtnBg: "rgba(20,15,35,0.95)",
+    themeOptionBg: "rgba(20,15,35,0.4)",
+    glowSoft: "rgba(177,156,217,0.2)", 
+    glowMedium: "rgba(177,156,217,0.4)", 
+    glowStrong: "rgba(177,156,217,0.7)",
+    cardGlowOverlay: "rgba(177,156,217,0.02)"
+  },
+  neon: { 
+    name: "Neon Lime", 
+    bg: "#081102", 
+    cardBg: "#142406", 
+    cardGradientStart: "rgba(20,45,9,0.95)",
+    cardGradientEnd: "rgba(8,18,2,0.98)",
+    accent: "#b8ff00", 
+    text: "#f4ffe6", 
+    border: "#3a5119", 
+    popupBg: "rgba(8,18,2,0.98)", 
+    btnGradientStart: "rgba(15,35,7,0.95)",
+    btnGradientEnd: "rgba(8,18,2,0.98)",
+    btnHover: "rgba(80,120,20,0.98)", 
+    actionBtnBg: "rgba(15,35,7,0.95)",
+    themeOptionBg: "rgba(15,35,7,0.4)",
+    glowSoft: "rgba(184,255,0,0.2)", 
+    glowMedium: "rgba(184,255,0,0.4)", 
+    glowStrong: "rgba(184,255,0,0.7)",
+    cardGlowOverlay: "rgba(184,255,0,0.02)"
+  },
+  magenta: { 
+    name: "Deep Magenta", 
+    bg: "#110209", 
+    cardBg: "#240616", 
+    cardGradientStart: "rgba(45,9,28,0.95)",
+    cardGradientEnd: "rgba(18,2,10,0.98)",
+    accent: "#d63384", 
+    text: "#ffe6f0", 
+    border: "#511935", 
+    popupBg: "rgba(18,2,10,0.98)", 
+    btnGradientStart: "rgba(35,7,22,0.95)",
+    btnGradientEnd: "rgba(20,2,13,0.98)",
+    btnHover: "rgba(120,20,70,0.98)", 
+    actionBtnBg: "rgba(35,7,22,0.95)",
+    themeOptionBg: "rgba(35,7,22,0.4)",
+    glowSoft: "rgba(214,51,132,0.2)", 
+    glowMedium: "rgba(214,51,132,0.4)", 
+    glowStrong: "rgba(214,51,132,0.7)",
+    cardGlowOverlay: "rgba(214,51,132,0.02)"
+  },
+  arctic: { 
+    name: "Arctic Blue", 
+    bg: "#020911", 
+    cardBg: "#061a24", 
+    cardGradientStart: "rgba(9,35,45,0.95)",
+    cardGradientEnd: "rgba(2,10,18,0.98)",
+    accent: "#7dd3fc", 
+    text: "#e6f7ff", 
+    border: "#193551", 
+    popupBg: "rgba(2,10,18,0.98)", 
+    btnGradientStart: "rgba(7,28,35,0.95)",
+    btnGradientEnd: "rgba(2,13,20,0.98)",
+    btnHover: "rgba(20,70,120,0.98)", 
+    actionBtnBg: "rgba(7,28,35,0.95)",
+    themeOptionBg: "rgba(7,28,35,0.4)",
+    glowSoft: "rgba(125,211,252,0.2)", 
+    glowMedium: "rgba(125,211,252,0.4)", 
+    glowStrong: "rgba(125,211,252,0.7)",
+    cardGlowOverlay: "rgba(125,211,252,0.02)"
+  }
+};
+
 const track = document.getElementById('carouselTrack');
 const container = document.getElementById('carouselContainer');
 const emailModal = document.getElementById('emailModal');
@@ -657,18 +1177,17 @@ const seeAllModal = document.getElementById('seeAllModal');
 const seeAllModalClose = document.getElementById('seeAllModalClose');
 const seeAllGrid = document.getElementById('seeAllGrid');
 const CREATOR_EMAIL = "olusolaayodeji5112@gmail.com";
+let currentTheme = 'emerald';
+let selectedTheme = null;
+let themeResumeTimeout = null;
 
 // === BUILD CAROUSEL ===
 function buildCarousel() {
   track.innerHTML = '';
-  
-  // Add all social media cards
   socialMedia.forEach(item => {
     const card = createSocialCard(item.name, item.url, false);
     track.appendChild(card);
   });
-  
-  // Add verification card
   const verifyCard = createVerificationCard();
   track.appendChild(verifyCard);
 }
@@ -685,15 +1204,25 @@ function createSocialCard(name, url, isVerify = false) {
       Visit ${name} →
     </a>
     <div class="card-actions" id="cardActions">
-      <button class="action-btn email-btn" title="Contact Creator">
-        ✉️ Email Us
-      </button>
-      <button class="action-btn see-all-btn" title="See All Platforms">
-        📋 See All
-      </button>
+      <button class="action-btn email-btn" title="Contact Creator">✉️ Email Us</button>
+      <button class="action-btn see-all-btn" title="See All Platforms">📋 See All</button>
+      <div class="theme-picker-wrapper">
+        <button class="action-btn theme-picker-btn" title="Change Theme">🎨 Themes</button>
+        <div class="theme-dropdown" id="themeDropdown">
+          ${Object.entries(themes).map(([key, theme]) => `
+            <div class="theme-option ${key === currentTheme ? 'active' : ''}" data-theme="${key}" tabindex="0">
+              <div class="theme-swatch" style="background: ${theme.accent}; border-color: ${theme.border}"></div>
+              <span class="theme-name">${theme.name}</span>
+            </div>
+          `).join('')}
+          <div class="theme-actions">
+            <button class="theme-cancel-btn">Cancel</button>
+            <button class="theme-apply-btn">Apply Theme</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
-  
   if (isVerify) card.classList.add('checklist-card');
   return card;
 }
@@ -721,16 +1250,8 @@ function createVerificationCard() {
     { label: "USPTO Fair Use", url: "https://www.uspto.gov/trademarks/basics/nominative-fair-use" }
   ];
   
-  const checklistHTML = checklist.map(item => `
-    <div class="checklist-item">
-      <span class="check">${item.check}</span>
-      <div class="text"><strong>${item.title}</strong>${item.desc}</div>
-    </div>
-  `).join('');
-  
-  const proofsHTML = proofs.map(proof => `
-    <a href="${proof.url}" target="_blank" rel="noopener" class="proof-link">🔗 ${proof.label}</a>
-  `).join('');
+  const checklistHTML = checklist.map(item => `<div class="checklist-item"><span class="check">${item.check}</span><div class="text"><strong>${item.title}</strong>${item.desc}</div></div>`).join('');
+  const proofsHTML = proofs.map(proof => `<a href="${proof.url}" target="_blank" rel="noopener" class="proof-link">🔗 ${proof.label}</a>`).join('');
   
   card.innerHTML = `
     <div class="verified-badge">100% Verified</div>
@@ -742,7 +1263,21 @@ function createVerificationCard() {
     <div class="card-actions" id="cardActions">
       <button class="action-btn email-btn">✉️ Email Us</button>
       <button class="action-btn see-all-btn">📋 See All</button>
-
+      <div class="theme-picker-wrapper">
+        <button class="action-btn theme-picker-btn">🎨 Themes</button>
+        <div class="theme-dropdown" id="themeDropdown">
+          ${Object.entries(themes).map(([key, theme]) => `
+            <div class="theme-option ${key === currentTheme ? 'active' : ''}" data-theme="${key}" tabindex="0">
+              <div class="theme-swatch" style="background: ${theme.accent}; border-color: ${theme.border}"></div>
+              <span class="theme-name">${theme.name}</span>
+            </div>
+          `).join('')}
+          <div class="theme-actions">
+            <button class="theme-cancel-btn">Cancel</button>
+            <button class="theme-apply-btn">Apply Theme</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
   return card;
@@ -756,7 +1291,7 @@ const secondsPerCard = 1.5;
 const totalDuration = cardsPerCopy * secondsPerCard;
 track.style.animationDuration = `${totalDuration}s`;
 
-// === 3-SECOND AUTO-RESUME ===
+// === 3-SECOND AUTO-RESUME (General) ===
 let resumeTimeout = null;
 function pauseAndScheduleResume() {
   track.style.animationPlayState = 'paused';
@@ -771,10 +1306,17 @@ container.addEventListener('mouseleave', () => { clearTimeout(resumeTimeout); tr
 
 // === SWIPE NAVIGATION ===
 let touchStartX = 0, touchEndX = 0, isSwiping = false;
-container.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; isSwiping = true; pauseAndScheduleResume(); }, { passive: true });
-container.addEventListener('touchmove', (e) => { if(isSwiping) touchEndX = e.changedTouches[0].screenX; }, { passive: true });
+container.addEventListener('touchstart', (e) => { 
+  touchStartX = e.changedTouches[0].screenX; 
+  isSwiping = true; 
+  pauseAndScheduleResume(); 
+}, { passive: true });
+container.addEventListener('touchmove', (e) => { 
+  if(isSwiping) touchEndX = e.changedTouches[0].screenX; 
+}, { passive: true });
 container.addEventListener('touchend', () => {
-  if(!isSwiping) return; isSwiping = false;
+  if(!isSwiping) return; 
+  isSwiping = false;
   const diff = touchStartX - touchEndX;
   if(Math.abs(diff) > 80) {
     const cardWidth = window.innerWidth;
@@ -782,60 +1324,281 @@ container.addEventListener('touchend', () => {
     let currentX = currentTransform !== 'none' ? new DOMMatrix(currentTransform).m41 : 0;
     track.style.transition = 'transform 0.4s ease-out';
     track.style.transform = `translateX(${currentX + (diff > 0 ? -cardWidth : cardWidth)}px)`;
-    setTimeout(() => { track.style.transition = ''; track.style.animationPlayState = 'running'; }, 400);
-  } else { track.style.animationPlayState = 'running'; }
+    setTimeout(() => { 
+      track.style.transition = ''; 
+      track.style.animationPlayState = 'running'; 
+    }, 400);
+  } else { 
+    track.style.animationPlayState = 'running'; 
+  }
 });
+
+// === SMART DROPDOWN POSITIONING ===
+function positionDropdown(dropdown) {
+  const rect = dropdown.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  // Reset classes
+  dropdown.classList.remove('flipped-left', 'flipped-top');
+  
+  // Check horizontal overflow
+  if (rect.right > viewportWidth - 10) {
+    dropdown.classList.add('flipped-left');
+  }
+  
+  // Check vertical overflow
+  if (rect.bottom > viewportHeight - 10) {
+    dropdown.classList.add('flipped-top');
+  }
+  
+  // For mobile: center the dropdown
+  if (window.innerWidth <= 768) {
+    dropdown.classList.remove('flipped-left', 'flipped-top');
+    // Position is handled by CSS media query
+  }
+}
 
 // === CARD CLICK: Show Actions ===
 document.addEventListener('click', (e) => {
+  // Don't close actions/dropdowns if clicking inside them
+  if (e.target.closest('.card-actions') || e.target.closest('.theme-dropdown')) {
+    return;
+  }
+  
   document.querySelectorAll('.card-actions').forEach(a => a.classList.remove('visible'));
+  document.querySelectorAll('.theme-dropdown').forEach(d => {
+    d.classList.remove('show');
+    d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+  });
+  selectedTheme = null;
+  
   const card = e.target.closest('.social-card');
-  if(card && !e.target.closest('.social-btn') && !e.target.closest('.action-btn')) {
+  if (card && !e.target.closest('.social-btn') && !e.target.closest('.action-btn')) {
     card.querySelector('.card-actions')?.classList.add('visible');
     pauseAndScheduleResume();
   }
 });
 
+// === THEME PICKER: OPEN/CLOSE ===
+document.addEventListener('click', (e) => {
+  // Toggle dropdown on theme button click
+  if (e.target.closest('.theme-picker-btn')) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.theme-picker-wrapper');
+    const dropdown = wrapper.querySelector('.theme-dropdown');
+    const isVisible = dropdown.classList.contains('show');
+    
+    // Close all other dropdowns first
+    document.querySelectorAll('.theme-dropdown').forEach(d => {
+      if (d !== dropdown) {
+        d.classList.remove('show');
+        d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+      }
+    });
+    
+    // Toggle current dropdown
+    if (isVisible) {
+      dropdown.classList.remove('show');
+      dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+      selectedTheme = null;
+    } else {
+      dropdown.classList.add('show');
+      // Position dropdown smartly
+      setTimeout(() => positionDropdown(dropdown), 10);
+      // Pre-select current theme visually
+      dropdown.querySelector(`.theme-option[data-theme="${currentTheme}"]`)?.classList.add('selected');
+      selectedTheme = currentTheme;
+    }
+    pauseAndScheduleResume();
+    return;
+  }
+  
+  // Theme option selection (preview only, doesn't apply yet)
+  const option = e.target.closest('.theme-option');
+  if (option && !e.target.closest('.theme-actions')) {
+    e.stopPropagation();
+    const dropdown = option.closest('.theme-dropdown');
+    dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+    selectedTheme = option.dataset.theme;
+    return;
+  }
+  
+  // Apply button click
+  if (e.target.closest('.theme-apply-btn')) {
+    e.stopPropagation();
+    if (selectedTheme && themes[selectedTheme]) {
+      applyTheme(selectedTheme);
+      // Close dropdown after apply
+      const dropdown = e.target.closest('.theme-dropdown');
+      dropdown.classList.remove('show');
+      dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+      selectedTheme = null;
+      // Pause animation, wait 3 seconds, then resume
+      track.style.animationPlayState = 'paused';
+      clearTimeout(themeResumeTimeout);
+      themeResumeTimeout = setTimeout(() => {
+        track.style.animationPlayState = 'running';
+      }, 3000);
+    }
+    return;
+  }
+  
+  // Cancel button click
+  if (e.target.closest('.theme-cancel-btn')) {
+    e.stopPropagation();
+    const dropdown = e.target.closest('.theme-dropdown');
+    dropdown.classList.remove('show');
+    dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+    selectedTheme = null;
+    track.style.animationPlayState = 'running';
+    return;
+  }
+  
+  // Close dropdown if clicking outside theme-picker-wrapper
+  if (!e.target.closest('.theme-picker-wrapper')) {
+    document.querySelectorAll('.theme-dropdown').forEach(d => {
+      d.classList.remove('show');
+      d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+    });
+    selectedTheme = null;
+  }
+});
+
+// Handle keyboard navigation for theme options
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { 
+    closeEmailModal(); 
+    closeSeeAllModal(); 
+    document.querySelectorAll('.theme-dropdown').forEach(d => {
+      d.classList.remove('show');
+      d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+    });
+    selectedTheme = null; 
+  }
+  if (e.key === ' ' || e.key === 'Spacebar') { 
+    e.preventDefault(); 
+    track.style.animationPlayState = track.style.animationPlayState === 'paused' ? 'running' : 'paused'; 
+  }
+});
+
+// === APPLY THEME FUNCTION ===
+function applyTheme(themeKey) {
+  const t = themes[themeKey];
+  if (!t) return;
+  currentTheme = themeKey;
+  
+  // Update ALL CSS variables for complete theme change
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.documentElement.style.setProperty('--card-bg', t.cardBg);
+  document.documentElement.style.setProperty('--card-gradient-start', t.cardGradientStart);
+  document.documentElement.style.setProperty('--card-gradient-end', t.cardGradientEnd);
+  document.documentElement.style.setProperty('--accent', t.accent);
+  document.documentElement.style.setProperty('--text', t.text);
+  document.documentElement.style.setProperty('--border', t.border);
+  document.documentElement.style.setProperty('--popup-bg', t.popupBg);
+  document.documentElement.style.setProperty('--btn-gradient-start', t.btnGradientStart);
+  document.documentElement.style.setProperty('--btn-gradient-end', t.btnGradientEnd);
+  document.documentElement.style.setProperty('--btn-hover', t.btnHover);
+  document.documentElement.style.setProperty('--action-btn-bg', t.actionBtnBg);
+  document.documentElement.style.setProperty('--theme-option-bg', t.themeOptionBg);
+  document.documentElement.style.setProperty('--glow-soft', t.glowSoft);
+  document.documentElement.style.setProperty('--glow-medium', t.glowMedium);
+  document.documentElement.style.setProperty('--glow-strong', t.glowStrong);
+  document.documentElement.style.setProperty('--card-glow-overlay', t.cardGlowOverlay);
+  
+  // Update theme picker UI - mark active theme
+  document.querySelectorAll('.theme-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.theme === themeKey);
+  });
+  
+  // Save to session storage
+  sessionStorage.setItem('savedTheme', themeKey);
+  
+  console.log(`🎨 Theme applied: ${t.name}`);
+}
+
+// Load saved theme on page load
+const saved = sessionStorage.getItem('savedTheme');
+if (saved && themes[saved]) applyTheme(saved);
+
+// Handle window resize for dropdown repositioning
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.theme-dropdown.show').forEach(dropdown => {
+    positionDropdown(dropdown);
+  });
+});
 
 // === EMAIL MODAL ===
-function openEmailModal() { emailModal.classList.add('active'); copyFeedback.classList.remove('show'); }
-function closeEmailModal() { emailModal.classList.remove('active'); }
+function openEmailModal() { 
+  emailModal.classList.add('active'); 
+  copyFeedback.classList.remove('show'); 
+}
+function closeEmailModal() { 
+  emailModal.classList.remove('active'); 
+}
 emailModalClose.addEventListener('click', closeEmailModal);
-emailModal.addEventListener('click', (e) => { if(e.target === emailModal) closeEmailModal(); });
-copyEmailBtn.addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(CREATOR_EMAIL); copyFeedback.classList.add('show'); setTimeout(() => copyFeedback.classList.remove('show'), 2000); }
-  catch { emailDisplay.select(); document.execCommand('copy'); copyFeedback.classList.add('show'); setTimeout(() => copyFeedback.classList.remove('show'), 2000); }
+emailModal.addEventListener('click', (e) => { 
+  if (e.target === emailModal) closeEmailModal(); 
 });
-directEmailBtn.addEventListener('click', () => { window.location.href = `mailto:${CREATOR_EMAIL}`; closeEmailModal(); });
+copyEmailBtn.addEventListener('click', async () => {
+  try { 
+    await navigator.clipboard.writeText(CREATOR_EMAIL); 
+    copyFeedback.classList.add('show'); 
+    setTimeout(() => copyFeedback.classList.remove('show'), 2000); 
+  } catch { 
+    emailDisplay.select(); 
+    document.execCommand('copy'); 
+    copyFeedback.classList.add('show'); 
+    setTimeout(() => copyFeedback.classList.remove('show'), 2000); 
+  }
+});
+directEmailBtn.addEventListener('click', () => { 
+  window.location.href = `mailto:${CREATOR_EMAIL}`; 
+  closeEmailModal(); 
+});
 
 // === SEE ALL MODAL ===
 function buildSeeAllGrid() {
-  seeAllGrid.innerHTML = socialMedia.map(item => `
-    <div class="see-all-item">
-      <a href="${item.url}" target="_blank" rel="noopener">${item.name}</a>
-    </div>
-  `).join('');
+  seeAllGrid.innerHTML = socialMedia.map(item => 
+    `<div class="see-all-item"><a href="${item.url}" target="_blank" rel="noopener">${item.name}</a></div>`
+  ).join('');
 }
 buildSeeAllGrid();
 
 function openSeeAllModal() { seeAllModal.classList.add('active'); }
 function closeSeeAllModal() { seeAllModal.classList.remove('active'); }
 seeAllModalClose.addEventListener('click', closeSeeAllModal);
-seeAllModal.addEventListener('click', (e) => { if(e.target === seeAllModal) closeSeeAllModal(); });
+seeAllModal.addEventListener('click', (e) => { 
+  if (e.target === seeAllModal) closeSeeAllModal(); 
+});
 
 // === ACTION BUTTONS ===
 document.addEventListener('click', (e) => {
-  if(e.target.closest('.email-btn')) { openEmailModal(); }
-  if(e.target.closest('.see-all-btn')) { openSeeAllModal(); }
+  if (e.target.closest('.email-btn')) { openEmailModal(); }
+  if (e.target.closest('.see-all-btn')) { openSeeAllModal(); }
 });
 
-// === KEYBOARD ===
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape') { closeEmailModal(); closeSeeAllModal(); }
-  if(e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); track.style.animationPlayState = track.style.animationPlayState === 'paused' ? 'running' : 'paused'; }
+// === TOUCH OPTIMIZATIONS ===
+// Add passive event listeners for better touch performance
+['touchstart', 'touchmove', 'touchend'].forEach(event => {
+  document.addEventListener(event, () => {}, { passive: true });
 });
 
+// Prevent zoom on double-tap for mobile
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (event) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    event.preventDefault();
+  }
+  lastTouchEnd = now;
+}, { passive: false });
 
+console.log(`🎠 Carousel: ${cardsPerCopy} cards | ${totalDuration}s | 12 Full-Color Themes | Swipe + Verified`);
+console.log(`✅ Brand Compliance: 100% Verified | Themes: ${Object.keys(themes).length} | Last: ${new Date().toLocaleDateString()}`);
+console.log(`📱 Mobile Optimized: Touch targets 44px+ | Smart dropdown positioning | Viewport-aware`);
 </script>
 </body>
 </html>
