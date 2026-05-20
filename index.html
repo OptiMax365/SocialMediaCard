@@ -1,2035 +1,471 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Social Media Sliding Cards - Verified</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Universal Social Media Directory</title>
 
 <style>
-:root {
-  /* DEFAULT THEME: Emerald Green - ALL VALUES DYNAMIC */
-  --bg: #02110b;
-  --card-bg: #062416;
-  --card-gradient-start: rgba(9,61,35,0.95);
-  --card-gradient-end: rgba(2,18,12,0.98);
-  --accent: #1ee66f;
-  --text: #eafff2;
-  --border: #195135;
-  --popup-bg: rgba(2, 18, 12, 0.98);
-  --btn-gradient-start: rgba(7,45,28,0.95);
-  --btn-gradient-end: rgba(2,20,13,0.98);
-  --btn-hover: rgba(20,120,60,0.98);
-  --action-btn-bg: rgba(7,45,28,0.95);
-  --theme-option-bg: rgba(7,45,28,0.4);
-  --glow-soft: rgba(30,230,111,0.2);
-  --glow-medium: rgba(30,230,111,0.4);
-  --glow-strong: rgba(30,230,111,0.7);
-  --card-glow-overlay: rgba(30,230,111,0.02);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
-  transition: background 0.4s ease, color 0.4s ease;
-}
-
-/* === CAROUSEL CONTAINER === */
-.carousel-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: var(--bg);
-  touch-action: pan-y;
-  transition: background 0.4s ease;
-  /* Prevent scroll chaining on mobile */
-  overscroll-behavior: contain;
-}
-
-/* === SLIDING TRACK === */
-.carousel-track {
-  display: flex;
-  height: 100%;
-  width: fit-content;
-  animation: slideRightToLeft 120s linear infinite;
-  will-change: transform;
-  transition: transform 0.3s ease-out;
-  /* Critical fix: prevent pointer events from propagating during interaction */
-  pointer-events: none;
-}
-
-.carousel-track.interacting {
-  pointer-events: auto;
-}
-
-/* === EACH CARD - FULL VIEWPORT === */
-.social-card {
-  flex: 0 0 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
-  border-right: 1px solid rgba(60,150,100,0.28);
-  position: relative;
-  overflow: hidden;
-  user-select: none;
-  transition: background 0.4s ease, border-color 0.4s ease;
-  /* Critical: enable pointer events on cards for interaction */
-  pointer-events: auto;
-  /* Prevent accidental swipes when interacting with card content */
-  touch-action: pan-y pinch-zoom;
-}
-
-.social-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--glow-soft), transparent, var(--card-glow-overlay));
-  pointer-events: none;
-  transition: background 0.4s ease;
-}
-
-/* === SOCIAL MEDIA TITLE === */
-.social-title {
-  font-size: clamp(3rem, 10vw, 6rem);
-  font-weight: 800;
-  color: var(--accent);
-  text-align: center;
-  margin-bottom: 50px;
-  text-shadow: 0 0 25px var(--glow-strong), 0 0 50px var(--glow-medium);
-  z-index: 2;
-  letter-spacing: -0.02em;
-  animation: titlePulse 3s ease-in-out infinite;
-  transition: color 0.4s ease, text-shadow 0.4s ease;
-  /* Prevent text selection interference */
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-@keyframes titlePulse {
-  0%, 100% { 
-    text-shadow: 0 0 25px var(--glow-strong), 0 0 50px var(--glow-medium);
-    transform: scale(1);
-  }
-  50% { 
-    text-shadow: 0 0 35px var(--accent), 0 0 70px var(--glow-medium);
-    transform: scale(1.02);
-  }
-}
-
-/* === CLICKABLE BUTTON === */
-.social-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 50px;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: white;
-  text-decoration: none;
-  background: linear-gradient(90deg, var(--btn-gradient-start), var(--btn-gradient-end));
-  border: 2px solid var(--glow-medium);
-  border-radius: 24px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 25px var(--glow-soft), inset 0 0 20px var(--glow-soft);
-  z-index: 2;
-  min-width: 300px;
-  text-align: center;
-  user-select: auto;
-  touch-action: manipulation;
-  /* Ensure button interactions don't trigger card movement */
-  pointer-events: auto;
-}
-
-.social-btn:hover {
-  transform: translateY(-5px) scale(1.05);
-  background: var(--btn-hover);
-  border-color: var(--accent);
-  box-shadow: 0 0 40px var(--glow-medium), 0 0 80px var(--glow-soft), inset 0 0 30px var(--glow-soft);
-  color: white;
-}
-
-.social-btn:active {
-  transform: translateY(-2px) scale(1.02);
-}
-
-/* === CARD ACTION BUTTONS (Left Side) === */
-.card-actions {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.card-actions.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.action-btn {
-  background: linear-gradient(90deg, var(--btn-gradient-start), var(--btn-gradient-end));
-  border: 2px solid var(--glow-medium);
-  border-radius: 16px;
-  padding: 12px 20px;
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  min-width: 140px;
-  min-height: 44px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  touch-action: manipulation;
-  /* Ensure buttons are interactive */
-  pointer-events: auto;
-}
-
-.action-btn:hover {
-  transform: translateX(3px);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--glow-medium);
-  background: var(--btn-hover);
-}
-
-.action-btn:active {
-  transform: translateX(2px) scale(0.98);
-}
-
-/* Theme Picker Dropdown - FIXED FOR MOBILE */
-.theme-picker-wrapper {
-  position: relative;
-  z-index: 1000; /* Ensure wrapper is above cards */
-}
-
-.theme-picker-btn {
-  width: 100%;
-  justify-content: center;
-}
-
-.theme-dropdown {
-  position: fixed; /* Changed to fixed for mobile viewport positioning */
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.95);
-  background: var(--card-bg);
-  border: 2px solid var(--border);
-  border-radius: 20px;
-  padding: 15px;
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 280px;
-  max-width: 92vw; /* Mobile-friendly max width */
-  max-height: 75vh; /* Limit height to stay in viewport */
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 2000; /* CRITICAL: Always on top of everything */
-  box-shadow: 0 0 40px var(--glow-strong), 0 0 80px var(--glow-medium);
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.25s ease, opacity 0.25s ease;
-  opacity: 0;
-  pointer-events: none;
-  /* Mobile overlay effect */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.theme-dropdown.show {
-  display: flex;
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-  pointer-events: auto;
-  animation: dropdownAppear 0.25s ease-out forwards;
-}
-
-@keyframes dropdownAppear {
-  from { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  to { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-/* Desktop positioning overrides */
-@media (min-width: 769px) {
-  .theme-dropdown {
-    position: absolute;
-    top: auto;
-    left: 100%;
-    transform: none;
-    margin-left: 10px;
-    max-height: 55vh;
-    z-index: 1000;
-  }
-  
-  .theme-dropdown.flipped-left {
-    left: auto;
-    right: 100%;
-    margin-left: 0;
-    margin-right: 10px;
-  }
-  
-  .theme-dropdown.flipped-top {
-    top: auto;
-    bottom: 0;
-  }
-}
-
-.theme-dropdown.flipped-left,
-.theme-dropdown.flipped-top {
-  /* Mobile: always centered regardless of flip classes */
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.theme-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-  background: var(--theme-option-bg);
-  min-height: 48px; /* Larger touch target for mobile */
-  touch-action: manipulation;
-}
-
-.theme-option:hover,
-.theme-option.selected {
-  border-color: var(--accent);
-  background: var(--btn-hover);
-  box-shadow: 0 0 15px var(--glow-medium);
-}
-
-.theme-option:active {
-  transform: scale(0.98);
-}
-
-.theme-swatch {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  border: 2px solid var(--border);
-  flex-shrink: 0;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
-}
-
-.theme-name {
-  font-size: 1rem;
-  color: var(--text);
-  transition: color 0.4s ease;
-  flex: 1;
-  font-weight: 500;
-}
-
-.theme-option.active .theme-swatch {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--glow-medium);
-}
-
-.theme-option.selected .theme-swatch {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 15px var(--glow-strong);
-  transform: scale(1.1);
-}
-
-/* Apply & Cancel Buttons */
-.theme-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-  padding-top: 15px;
-  border-top: 1px solid var(--border);
-}
-
-.theme-apply-btn,
-.theme-cancel-btn {
-  flex: 1;
-  padding: 14px 16px;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.25s ease;
-  min-height: 50px; /* Larger touch target */
-  touch-action: manipulation;
-}
-
-.theme-apply-btn {
-  background: linear-gradient(90deg, var(--accent), var(--border));
-  color: var(--bg);
-  font-weight: 700;
-}
-
-.theme-apply-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 25px var(--glow-medium);
-  filter: brightness(1.1);
-}
-
-.theme-apply-btn:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.theme-cancel-btn {
-  background: var(--action-btn-bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.theme-cancel-btn:hover {
-  background: var(--btn-hover);
-  border-color: var(--accent);
-}
-
-.theme-cancel-btn:active {
-  transform: scale(0.98);
-}
-
-/* === VERIFICATION BADGE === */
-.verified-badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, var(--accent), var(--border));
-  color: var(--bg);
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 0 20px var(--glow-medium);
-  z-index: 3;
-  transition: background 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
-}
-
-.verified-badge::before {
-  content: "✓";
-  font-weight: 900;
-}
-
-/* === BRAND CHECKLIST CARD === */
-.checklist-card {
-  padding: 30px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.checklist-title {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  color: var(--accent);
-  text-align: center;
-  margin-bottom: 30px;
-  text-shadow: 0 0 20px var(--glow-strong);
-  transition: color 0.4s ease, text-shadow 0.4s ease;
-}
-
-.checklist-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 30px;
-}
-
-.checklist-item {
-  background: var(--theme-option-bg);
-  border: 1px solid var(--glow-soft);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  transition: background 0.4s ease, border-color 0.4s ease;
-}
-
-.checklist-item .check {
-  color: var(--accent);
-  font-weight: 900;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  transition: color 0.4s ease;
-}
-
-.checklist-item .text {
-  font-size: 1rem;
-  line-height: 1.4;
-  color: var(--text);
-  transition: color 0.4s ease;
-}
-
-.checklist-item .text strong {
-  color: var(--accent);
-  display: block;
-  margin-bottom: 4px;
-  transition: color 0.4s ease;
-}
-
-.proof-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.proof-link {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 0.9rem;
-  padding: 6px 14px;
-  background: var(--glow-soft);
-  border-radius: 20px;
-  border: 1px solid var(--glow-medium);
-  transition: all 0.2s ease;
-  min-height: 36px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.proof-link:hover {
-  background: var(--btn-hover);
-  transform: translateY(-2px);
-  border-color: var(--accent);
-}
-
-.proof-link:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.update-note {
-  text-align: center;
-  font-size: 0.95rem;
-  color: rgba(234,255,242,0.8);
-  margin-top: 20px;
-  padding: 12px 20px;
-  background: var(--glow-soft);
-  border-radius: 12px;
-  border-left: 3px solid var(--accent);
-  transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
-}
-
-/* === MODALS (Email, See All, About) === */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: var(--popup-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1500; /* Below theme dropdown but above cards */
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-content {
-  background: var(--popup-bg);
-  border: 2px solid var(--accent);
-  border-radius: 24px;
-  padding: 30px;
-  max-width: 480px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 0 40px var(--glow-medium);
-  position: relative;
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 1.8rem;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s, color 0.4s ease;
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: manipulation;
-  z-index: 10;
-}
-
-.modal-close:hover { opacity: 1; color: var(--accent); }
-.modal-close:active { transform: scale(0.9); }
-
-.modal-title {
-  font-size: 1.8rem;
-  color: var(--accent);
-  margin-bottom: 25px;
-  text-shadow: 0 0 15px var(--glow-strong);
-  transition: color 0.4s ease, text-shadow 0.4s ease;
-}
-
-/* === ABOUT MODAL SPECIFIC STYLES === */
-.about-content {
-  text-align: left;
-  line-height: 1.6;
-}
-
-.about-section {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.about-section:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.about-section h4 {
-  color: var(--accent);
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.about-section p {
-  font-size: 0.95rem;
-  color: var(--text);
-  opacity: 0.95;
-  margin-bottom: 8px;
-}
-
-.about-highlight {
-  background: var(--glow-soft);
-  border-left: 3px solid var(--accent);
-  padding: 12px 16px;
-  border-radius: 0 12px 12px 0;
-  margin: 15px 0;
-  font-weight: 500;
-}
-
-.verification-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-}
-
-.verification-list li {
-  padding: 6px 0;
-  padding-left: 24px;
-  position: relative;
-  font-size: 0.9rem;
-}
-
-.verification-list li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-weight: bold;
-}
-
-.about-footer {
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.about-footer p {
-  font-size: 0.9rem;
-  opacity: 0.85;
-  margin-bottom: 15px;
-}
-
-/* === EMAIL MODAL === */
-.email-display {
-  background: var(--theme-option-bg);
-  border: 1px solid var(--glow-medium);
-  border-radius: 12px;
-  padding: 15px 20px;
-  margin-bottom: 25px;
-  font-family: monospace;
-  font-size: clamp(0.9rem, 3vw, 1.1rem);
-  word-break: break-word;
-  white-space: pre-wrap;
-  line-height: 1.5;
-  color: var(--text);
-  transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
-}
-
-.modal-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.modal-btn {
-  padding: 14px 24px;
-  border-radius: 16px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 48px;
-  touch-action: manipulation;
-}
-
-.modal-btn.copy {
-  background: linear-gradient(90deg, var(--btn-gradient-start), var(--btn-gradient-end));
-  border: 2px solid var(--glow-medium);
-  color: var(--text);
-}
-
-.modal-btn.copy:hover {
-  background: var(--btn-hover);
-  border-color: var(--accent);
-  transform: translateY(-3px);
-  box-shadow: 0 0 25px var(--glow-medium);
-}
-
-.modal-btn.copy:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.modal-btn.direct {
-  background: linear-gradient(90deg, var(--accent), var(--border));
-  color: var(--bg);
-  font-weight: 700;
-}
-
-.modal-btn.direct:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 30px var(--glow-medium);
-  filter: brightness(1.1);
-}
-
-.modal-btn.direct:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.copy-feedback {
-  margin-top: 12px;
-  color: var(--accent);
-  font-size: 0.95rem;
-  min-height: 20px;
-  opacity: 0;
-  transition: opacity 0.3s, color 0.4s ease;
-}
-
-.copy-feedback.show { opacity: 1; }
-
-/* === SEE ALL MODAL - GRID OF ALL SITES === */
-.see-all-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 10px 5px;
-}
-
-.see-all-item {
-  background: var(--theme-option-bg);
-  border: 1px solid var(--glow-soft);
-  border-radius: 14px;
-  padding: 14px;
-  text-align: center;
-  transition: all 0.25s ease;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.see-all-item:hover {
-  border-color: var(--accent);
-  background: var(--btn-hover);
-  transform: translateY(-3px);
-  box-shadow: 0 0 20px var(--glow-medium);
-}
-
-.see-all-item:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.see-all-item a {
-  color: var(--text);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  display: block;
-  transition: color 0.4s ease;
-}
-
-.see-all-item a:hover {
-  color: var(--accent);
-}
-
-/* === ANIMATIONS === */
-@keyframes slideRightToLeft {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
-  50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.15); }
-}
-
-.social-card::after {
-  content: "";
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--glow-medium), transparent 70%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  pointer-events: none;
-  animation: glowPulse 5s ease-in-out infinite;
-  transition: background 0.4s ease;
-}
-
-/* === MOBILE OPTIMIZATIONS - ENHANCED === */
-@media (max-width: 768px) {
-  .social-title { 
-    font-size: clamp(2.5rem, 8vw, 4rem); 
-    margin-bottom: 40px;
-    pointer-events: none; /* Prevent title from interfering with card clicks */
-  }
-  
-  .social-btn { 
-    padding: 18px 40px; 
-    font-size: 1.2rem; 
-    min-width: 260px;
-    min-height: 56px;
-  }
-  
-  .card-actions { 
-    left: 15px;
-    gap: 10px;
-  }
-  
-  .action-btn { 
-    padding: 10px 16px; 
-    font-size: 0.95rem; 
-    min-width: 120px;
-    min-height: 48px;
-  }
-  
-  /* Mobile theme dropdown is already fixed with position: fixed */
-  
-  .checklist-card { padding: 20px 15px; }
-  .checklist-grid { grid-template-columns: 1fr; }
-  .modal-content { padding: 30px 20px; }
-  .modal-title { font-size: 1.5rem; }
-  .see-all-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-  .modal-btn { min-height: 56px; font-size: 1.2rem; }
-  .about-content { font-size: 0.9rem; }
-  
-  .modal-close {
-    top: 10px;
-    right: 15px;
-    font-size: 1rem;
-    padding: 8px 16px;
-    min-width: auto;
-    min-height: 40px;
-    background: var(--action-btn-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-weight: 600;
-    opacity: 1;
-  }
-  .modal-close:hover {
-    background: var(--btn-hover);
-    border-color: var(--accent);
-    opacity: 1;
-  }
-  
-  /* Critical mobile fix: prevent swipe gestures when interacting with interactive elements */
-  .social-btn,
-  .action-btn,
-  .theme-option,
-  .theme-apply-btn,
-  .theme-cancel-btn,
-  .modal-btn,
-  .proof-link,
-  .modal-close {
-    touch-action: manipulation;
-  }
-}
-
-@media (max-width: 480px) {
-  .social-title { font-size: clamp(2rem, 7vw, 3.5rem); }
-  .social-btn { min-width: 240px; padding: 16px 32px; font-size: 1.1rem; }
-  .action-btn { min-width: 110px; font-size: 0.9rem; padding: 10px 14px; }
-  .theme-option { padding: 12px 14px; font-size: 0.95rem; }
-  .theme-swatch { width: 26px; height: 26px; }
-  .theme-name { font-size: 0.95rem; }
-  
-  /* Make theme dropdown even more mobile-friendly */
-  .theme-dropdown {
-    min-width: 90vw;
-    padding: 20px;
-    border-radius: 24px;
-  }
-  
-  .theme-actions {
-    flex-direction: column;
-  }
-  
-  .theme-apply-btn,
-  .theme-cancel-btn {
-    min-height: 56px;
-    font-size: 1.1rem;
-  }
-}
-
-/* Hide scrollbar but keep functionality */
-.carousel-container::-webkit-scrollbar { display: none; }
-.carousel-container { -ms-overflow-style: none; scrollbar-width: none; }
-.see-all-grid::-webkit-scrollbar,
-.modal-content::-webkit-scrollbar,
-.theme-dropdown::-webkit-scrollbar { width: 6px; }
-.see-all-grid::-webkit-scrollbar-thumb,
-.modal-content::-webkit-scrollbar-thumb,
-.theme-dropdown::-webkit-scrollbar-thumb { 
-  background: var(--border); 
-  border-radius: 3px;
-}
-.see-all-grid::-webkit-scrollbar-track,
-.modal-content::-webkit-scrollbar-track,
-.theme-dropdown::-webkit-scrollbar-track { background: transparent; }
-
-/* Prevent text selection on interactive elements */
-.social-card { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-.social-btn, .action-btn, .modal-btn, .theme-option, .proof-link { 
-  -webkit-user-select: auto; 
-  -moz-user-select: auto; 
-  -ms-user-select: auto; 
-  user-select: auto; 
-}
-
-/* Focus styles for accessibility */
-.social-btn:focus-visible,
-.action-btn:focus-visible,
-.modal-btn:focus-visible,
-.theme-option:focus-visible,
-.modal-close:focus-visible,
-.theme-apply-btn:focus-visible,
-.theme-cancel-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Overlay when theme dropdown is open on mobile */
-.theme-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1999; /* Just below dropdown */
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.theme-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (min-width: 769px) {
-  .theme-overlay {
-    display: none;
-  }
-}
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    body{
+        background:#01472b;
+        color:#f3f4f6;
+        font-family:Arial, Helvetica, sans-serif;
+        line-height:1.5;
+        padding:30px;
+    }
+
+    h1{
+        text-align:center;
+        margin-bottom:10px;
+        font-size:38px;
+    }
+
+    .subtitle{
+        text-align:center;
+        margin-bottom:40px;
+        color:#9ca3af;
+    }
+
+    .category{
+        margin-bottom:40px;
+    }
+
+    .category h2{
+        background:#00523d;
+        padding:14px 18px;
+        border-left:5px solid #00bba8;
+        margin-bottom:18px;
+        border-radius:8px;
+        font-size:24px;
+    }
+
+    .grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+        gap:16px;
+    }
+
+    .card{
+        background:#00593d;
+        border:1px solid #374151;
+        border-radius:10px;
+        padding:16px;
+        transition:0.2s ease;
+    }
+
+    .card:hover{
+        border-color:#024d35;
+        transform:translateY(-2px);
+    }
+
+    .platform-name{
+        font-size:18px;
+        font-weight:bold;
+        margin-bottom:8px;
+        color:#ffffff;
+    }
+
+    .platform-type{
+        font-size:14px;
+        color:#9ca3af;
+        margin-bottom:14px;
+    }
+
+    .go-btn{
+        display:inline-block;
+        text-decoration:none;
+        background:#008540;
+        color:white;
+        padding:10px 16px;
+        border-radius:6px;
+        font-size:14px;
+        transition:0.2s ease;
+    }
+
+    .go-btn:hover{
+        background:#3dffae;
+    }
+
+    footer{
+        margin-top:60px;
+        text-align:center;
+        color:#9ca3af;
+        font-size:14px;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="carousel-container" id="carouselContainer">
-  <div class="carousel-track" id="carouselTrack">
-    <!-- Cards injected by JavaScript -->
-  </div>
+<h1>All Social Media Directory</h1>
+
+<p class="subtitle">
+Plain Text Social Media Directory • Clean UI • No Official Logos • Universal Safe Design
+</p>
+
+<!-- VIDEO PLATFORMS -->
+<section class="category">
+<h2>Video Platforms</h2>
+
+<div class="grid">
+
+<div class="card">
+<div class="platform-name">YouTube</div>
+<div class="platform-type">Video Sharing</div>
+<a class="go-btn" href="https://youtube.com" target="_blank">Go To</a>
 </div>
 
-<!-- Theme Overlay for Mobile -->
-<div class="theme-overlay" id="themeOverlay"></div>
-
-<!-- Email Popup Modal -->
-<div class="modal-overlay" id="emailModal">
-  <div class="modal-content">
-    <button class="modal-close" id="emailModalClose" aria-label="Close modal">&times;</button>
-    <h3 class="modal-title">Contact Creator</h3>
-    <div class="email-display" id="emailDisplay">olusolaayodeji5112@gmail.com</div>
-    <div class="modal-btns">
-      <button class="modal-btn copy" id="copyEmail">
-        <span>📋</span> Copy Email Address
-      </button>
-      <button class="modal-btn direct" id="directEmail">
-        <span>✉️</span> Open Email App
-      </button>
-    </div>
-    <div class="copy-feedback" id="copyFeedback">✓ Copied to clipboard!</div>
-  </div>
+<div class="card">
+<div class="platform-name">TikTok</div>
+<div class="platform-type">Short Videos</div>
+<a class="go-btn" href="https://tiktok.com" target="_blank">Go To</a>
 </div>
 
-<!-- See All Modal -->
-<div class="modal-overlay" id="seeAllModal">
-  <div class="modal-content" style="max-width: 900px; width: 95%;">
-    <button class="modal-close" id="seeAllModalClose" aria-label="Close modal">Hide</button>
-    <h3 class="modal-title">All Social Media Platforms</h3>
-    <div class="see-all-grid" id="seeAllGrid">
-      <!-- Items injected by JS -->
-    </div>
-  </div>
+<div class="card">
+<div class="platform-name">Twitch</div>
+<div class="platform-type">Live Streaming</div>
+<a class="go-btn" href="https://twitch.tv" target="_blank">Go To</a>
 </div>
 
-<!-- About / Terms of Use Modal -->
-<div class="modal-overlay" id="aboutModal">
-  <div class="modal-content">
-    <button class="modal-close" id="aboutModalClose" aria-label="Close modal">Hide</button>
-    <h3 class="modal-title">✨ About This Project</h3>
-    <div class="about-content">
-      
-      <div class="about-section">
-        <h4>🎯 Why We Created This</h4>
-        <p>We built this beautiful sliding card interface to give everyone <strong>easy, one-click access</strong> to all major social media platforms in one place. Home To Social Media</p>
-        <div class="about-highlight">
-          🌍 Made with love for the global community. Free forever.
-        </div>
-      </div>
-
-      <div class="about-section">
-        <h4>✅ Brand Usage Verification</h4>
-        <p>Every brand name, title, and text label in this project has been carefully reviewed and verified for compliance:</p>
-        <ul class="verification-list">
-          <li>Text-only usage (no logos or trademarked assets)</li>
-          <li>Nominative fair use for identification purposes</li>
-          <li>Direct links to official, verified domains only</li>
-          <li>No modification of registered brand names</li>
-          <li>No commercial claims or endorsement implications</li>
-          <li>Quarterly audits against official brand guidelines</li>
-        </ul>
-      </div>
-
-      <div class="about-section">
-        <h4>🔍 Official References</h4>
-        <p>We follow published guidelines from:</p>
-        <ul class="verification-list">
-          <li>Meta Brand Resources</li>
-          <li>Google Brand Guidelines</li>
-          <li>X (Twitter) Brand Toolkit</li>
-          <li>TikTok Legal Guidelines</li>
-          <li>USPTO Fair Use Policy</li>
-        </ul>
-      </div>
-
-      <div class="about-section">
-        <h4>💬 Questions or Updates?</h4>
-        <p>We welcome your feedback, If you want include your social media, message us, we welcome you. If you notice anything that needs attention, have suggestions for new platforms, or just want to say hello, we'd love to hear from you.</p>
-        <div class="about-highlight">
-          📧 Us Am Here To Help, Feel Good To Reach Us anytime: <strong>olusolaayodeji5112@gmail.com</strong>
-        </div>
-      </div>
-
-    </div>
-    
-    <div class="about-footer">
-      <p style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">
-        🚀 We're excited to share this with the world
-      </p>
-      <p>Thank you for using our social media directory. Browse with confidence.</p>
-      <button class="modal-btn direct" id="aboutContactBtn" style="margin-top: 10px;">
-        <span>✉️</span> Contact Us
-      </button>
-    </div>
-    
-  </div>
+<div class="card">
+<div class="platform-name">Rumble</div>
+<div class="platform-type">Video Platform</div>
+<a class="go-btn" href="https://rumble.com" target="_blank">Go To</a>
 </div>
 
-<script>
-// === COMPLETE SOCIAL MEDIA LIST ===
-const socialMedia = [
-  { name: "YouTube", url: "https://www.youtube.com" },
-  { name: "TikTok", url: "https://www.tiktok.com" },
-  { name: "Facebook", url: "https://www.facebook.com" },
-  { name: "Instagram", url: "https://www.instagram.com" },
-  { name: "Twitch", url: "https://www.twitch.tv" },
-  { name: "Odysee", url: "https://odysee.com" },
-  { name: "DailyMotion", url: "https://www.dailymotion.com" },
-  { name: "Playeur", url: "https://playeur.com" },
-  { name: "Brighteon", url: "https://www.brighteon.com" },
-  { name: "Rumble", url: "https://rumble.com" },
-  { name: "PeerTube.TV", url: "https://www.peer.tube" },
-  { name: "Rocfin", url: "https://www.rocfin.com" },
-  { name: "BitChute", url: "https://www.bitchute.com" },
-  { name: "Flickr", url: "https://www.flickr.com" },
-  { name: "Pexels", url: "https://www.pexels.com" },
-  { name: "Sketchfab", url: "https://sketchfab.com" },
-  { name: "EyeEm", url: "https://www.eyeem.com" },
-  { name: "Imgpile", url: "https://imgpile.com" },
-  { name: "500px", url: "https://500px.com" },
-  { name: "YouPic", url: "https://youpic.com" },
-  { name: "Pixelfed", url: "https://pixelfed.org" },
-  { name: "VSCO", url: "https://vsco.co" },
-  { name: "Cara", url: "https://cara.app" },
-  { name: "Photo.net", url: "https://www.photo.net" },
-  { name: "Pixiv", url: "https://www.pixiv.net" },
-  { name: "Minds", url: "https://www.minds.com" },
-  { name: "Discord", url: "https://discord.com" },
-  { name: "Tumblr", url: "https://www.tumblr.com" },
-  { name: "Mastodon", url: "https://joinmastodon.org" },
-  { name: "Gab", url: "https://gab.com" },
-  { name: "Snapchat", url: "https://www.snapchat.com" },
-  { name: "9GAG", url: "https://9gag.com" },
-  { name: "Bluesky", url: "https://bsky.app" },
-  { name: "Diaspora", url: "https://diasporafoundation.org" },
-  { name: "Friendica", url: "https://friendi.ca" },
-  { name: "Lemmy", url: "https://join-lemmy.org" },
-  { name: "Mbin", url: "https://mbin.pub" },
-  { name: "Hive Social", url: "https://hivesocial.app" },
-  { name: "Vero", url: "https://vero.co" },
-  { name: "Ello", url: "https://ello.co" },
-  { name: "WT.Social", url: "https://wt.social" },
-  { name: "SpaceHey", url: "https://spacehey.com" },
-  { name: "Pillowfort", url: "https://pillowfort.social" },
-  { name: "Steemit", url: "https://steemit.com" },
-  { name: "Newgrounds", url: "https://www.newgrounds.com" },
-  { name: "Behance", url: "https://www.behance.net" },
-  { name: "ArtStation", url: "https://www.artstation.com" },
-  { name: "Amino", url: "https://aminoapps.com" },
-  { name: "We Heart It", url: "https://weheartit.com" },
-  { name: "Damus", url: "https://damus.io" },
-  { name: "Amethyst", url: "https://amethyst.social" },
-  { name: "Truth Social", url: "https://truthsocial.com" },
-  { name: "Lemon8", url: "https://www.lemon8-app.com" },
-  { name: "Clapper", url: "https://clapperapp.com" },
-  { name: "Imgur", url: "https://imgur.com" },
-  { name: "Telegram", url: "https://telegram.org" },
-  { name: "WhatsApp Channels", url: "https://www.whatsapp.com" },
-  { name: "WeChat Channels", url: "https://channels.weixin.qq.com" },
-  { name: "LINE", url: "https://line.me" },
-  { name: "VK (VKontakte)", url: "https://vk.com" },
-  { name: "Threads", url: "https://www.threads.net" },
-  { name: "X (Twitter)", url: "https://x.com" },
-  { name: "Reddit", url: "https://www.reddit.com" },
-  { name: "Pinterest", url: "https://www.pinterest.com" },
-  { name: "Quora", url: "https://www.quora.com" },
-  { name: "Substack", url: "https://substack.com" },
-  { name: "Medium", url: "https://medium.com" },
-  { name: "Scribble Hub", url: "https://www.scribblehub.com" },
-  { name: "Penana", url: "https://www.penana.com" },
-  { name: "Tapas", url: "https://tapas.io" },
-  { name: "Webtoon", url: "https://www.webtoons.com" },
-  { name: "Letterboxd", url: "https://letterboxd.com" },
-  { name: "Weasyl", url: "https://weasyl.com" },
-  { name: "Home", url: "https://home.social" },
-  { name: "Arfol", url: "https://arfol.co" },
-  { name: "Mix Social", url: "https://mix.com" },
-  { name: "Discover", url: "https://discover.hubpages.com" },
-  { name: "MeWe", url: "https://mewe.com" },
-  { name: "DeviantArt", url: "https://www.deviantart.com" },
-  { name: "Second1st", url: "https://second1st.com" }
-];
+<div class="card">
+<div class="platform-name">Odysee</div>
+<div class="platform-type">Decentralized Video</div>
+<a class="go-btn" href="https://odysee.com" target="_blank">Go To</a>
+</div>
 
-// === 12 PRE-DEFINED THEMES - FULL COLOR TEMPLATES ===
-const themes = {
-  emerald: { 
-    name: "Emerald Green", 
-    bg: "#02110b", 
-    cardBg: "#062416", 
-    cardGradientStart: "rgba(9,61,35,0.95)",
-    cardGradientEnd: "rgba(2,18,12,0.98)",
-    accent: "#1ee66f", 
-    text: "#eafff2", 
-    border: "#195135", 
-    popupBg: "rgba(2,18,12,0.98)", 
-    btnGradientStart: "rgba(7,45,28,0.95)",
-    btnGradientEnd: "rgba(2,20,13,0.98)",
-    btnHover: "rgba(20,120,60,0.98)", 
-    actionBtnBg: "rgba(7,45,28,0.95)",
-    themeOptionBg: "rgba(7,45,28,0.4)",
-    glowSoft: "rgba(30,230,111,0.2)", 
-    glowMedium: "rgba(30,230,111,0.4)", 
-    glowStrong: "rgba(30,230,111,0.7)",
-    cardGlowOverlay: "rgba(30,230,111,0.02)"
-  },
-  ocean: { 
-    name: "Ocean Blue", 
-    bg: "#020b11", 
-    cardBg: "#061624", 
-    cardGradientStart: "rgba(9,35,61,0.95)",
-    cardGradientEnd: "rgba(2,11,18,0.98)",
-    accent: "#3db4f2", 
-    text: "#e6f4ff", 
-    border: "#193551", 
-    popupBg: "rgba(2,11,18,0.98)", 
-    btnGradientStart: "rgba(7,28,45,0.95)",
-    btnGradientEnd: "rgba(2,13,20,0.98)",
-    btnHover: "rgba(20,60,120,0.98)", 
-    actionBtnBg: "rgba(7,28,45,0.95)",
-    themeOptionBg: "rgba(7,28,45,0.4)",
-    glowSoft: "rgba(61,180,242,0.2)", 
-    glowMedium: "rgba(61,180,242,0.4)", 
-    glowStrong: "rgba(61,180,242,0.7)",
-    cardGlowOverlay: "rgba(61,180,242,0.02)"
-  },
-  sunset: { 
-    name: "Sunset Orange", 
-    bg: "#110802", 
-    cardBg: "#241206", 
-    cardGradientStart: "rgba(61,35,9,0.95)",
-    cardGradientEnd: "rgba(18,8,2,0.98)",
-    accent: "#ff6b35", 
-    text: "#fff2e6", 
-    border: "#513019", 
-    popupBg: "rgba(18,8,2,0.98)", 
-    btnGradientStart: "rgba(45,28,7,0.95)",
-    btnGradientEnd: "rgba(20,13,2,0.98)",
-    btnHover: "rgba(120,60,20,0.98)", 
-    actionBtnBg: "rgba(45,28,7,0.95)",
-    themeOptionBg: "rgba(45,28,7,0.4)",
-    glowSoft: "rgba(255,107,53,0.2)", 
-    glowMedium: "rgba(255,107,53,0.4)", 
-    glowStrong: "rgba(255,107,53,0.7)",
-    cardGlowOverlay: "rgba(255,107,53,0.02)"
-  },
-  royal: { 
-    name: "Royal Purple", 
-    bg: "#0b0211", 
-    cardBg: "#160624", 
-    cardGradientStart: "rgba(35,9,61,0.95)",
-    cardGradientEnd: "rgba(11,2,18,0.98)",
-    accent: "#9d4edd", 
-    text: "#f2e6ff", 
-    border: "#351951", 
-    popupBg: "rgba(11,2,18,0.98)", 
-    btnGradientStart: "rgba(28,7,45,0.95)",
-    btnGradientEnd: "rgba(13,2,20,0.98)",
-    btnHover: "rgba(60,20,120,0.98)", 
-    actionBtnBg: "rgba(28,7,45,0.95)",
-    themeOptionBg: "rgba(28,7,45,0.4)",
-    glowSoft: "rgba(157,78,221,0.2)", 
-    glowMedium: "rgba(157,78,221,0.4)", 
-    glowStrong: "rgba(157,78,221,0.7)",
-    cardGlowOverlay: "rgba(157,78,221,0.02)"
-  },
-  cyber: { 
-    name: "Cyber Pink", 
-    bg: "#11020a", 
-    cardBg: "#24061a", 
-    cardGradientStart: "rgba(61,9,35,0.95)",
-    cardGradientEnd: "rgba(18,2,11,0.98)",
-    accent: "#ff00aa", 
-    text: "#ffe6f4", 
-    border: "#51193a", 
-    popupBg: "rgba(18,2,11,0.98)", 
-    btnGradientStart: "rgba(45,7,28,0.95)",
-    btnGradientEnd: "rgba(20,2,13,0.98)",
-    btnHover: "rgba(120,20,80,0.98)", 
-    actionBtnBg: "rgba(45,7,28,0.95)",
-    themeOptionBg: "rgba(45,7,28,0.4)",
-    glowSoft: "rgba(255,0,170,0.2)", 
-    glowMedium: "rgba(255,0,170,0.4)", 
-    glowStrong: "rgba(255,0,170,0.7)",
-    cardGlowOverlay: "rgba(255,0,170,0.02)"
-  },
-  golden: { 
-    name: "Golden Yellow", 
-    bg: "#110d02", 
-    cardBg: "#241e06", 
-    cardGradientStart: "rgba(61,51,9,0.95)",
-    cardGradientEnd: "rgba(18,14,2,0.98)",
-    accent: "#ffd700", 
-    text: "#fffde6", 
-    border: "#514519", 
-    popupBg: "rgba(18,14,2,0.98)", 
-    btnGradientStart: "rgba(45,38,7,0.95)",
-    btnGradientEnd: "rgba(20,17,2,0.98)",
-    btnHover: "rgba(120,100,20,0.98)", 
-    actionBtnBg: "rgba(45,38,7,0.95)",
-    themeOptionBg: "rgba(45,38,7,0.4)",
-    glowSoft: "rgba(255,215,0,0.2)", 
-    glowMedium: "rgba(255,215,0,0.4)", 
-    glowStrong: "rgba(255,215,0,0.7)",
-    cardGlowOverlay: "rgba(255,215,0,0.02)"
-  },
-  crimson: { 
-    name: "Crimson Red", 
-    bg: "#110204", 
-    cardBg: "#24060a", 
-    cardGradientStart: "rgba(61,9,15,0.95)",
-    cardGradientEnd: "rgba(18,2,4,0.98)",
-    accent: "#e63946", 
-    text: "#ffe6e8", 
-    border: "#51191f", 
-    popupBg: "rgba(18,2,4,0.98)", 
-    btnGradientStart: "rgba(45,7,11,0.95)",
-    btnGradientEnd: "rgba(20,2,4,0.98)",
-    btnHover: "rgba(120,20,30,0.98)", 
-    actionBtnBg: "rgba(45,7,11,0.95)",
-    themeOptionBg: "rgba(45,7,11,0.4)",
-    glowSoft: "rgba(230,57,70,0.2)", 
-    glowMedium: "rgba(230,57,70,0.4)", 
-    glowStrong: "rgba(230,57,70,0.7)",
-    cardGlowOverlay: "rgba(230,57,70,0.02)"
-  },
-  teal: { 
-    name: "Teal Cyan", 
-    bg: "#021111", 
-    cardBg: "#062424", 
-    cardGradientStart: "rgba(9,61,61,0.95)",
-    cardGradientEnd: "rgba(2,18,18,0.98)",
-    accent: "#00d4d4", 
-    text: "#e6ffff", 
-    border: "#195151", 
-    popupBg: "rgba(2,18,18,0.98)", 
-    btnGradientStart: "rgba(7,45,45,0.95)",
-    btnGradientEnd: "rgba(2,20,20,0.98)",
-    btnHover: "rgba(20,120,120,0.98)", 
-    actionBtnBg: "rgba(7,45,45,0.95)",
-    themeOptionBg: "rgba(7,45,45,0.4)",
-    glowSoft: "rgba(0,212,212,0.2)", 
-    glowMedium: "rgba(0,212,212,0.4)", 
-    glowStrong: "rgba(0,212,212,0.7)",
-    cardGlowOverlay: "rgba(0,212,212,0.02)"
-  },
-  lavender: { 
-    name: "Lavender", 
-    bg: "#0a0611", 
-    cardBg: "#1a1224", 
-    cardGradientStart: "rgba(26,18,45,0.95)",
-    cardGradientEnd: "rgba(11,8,18,0.98)",
-    accent: "#b19cd9", 
-    text: "#f0e6ff", 
-    border: "#3a2a51", 
-    popupBg: "rgba(11,8,18,0.98)", 
-    btnGradientStart: "rgba(20,15,35,0.95)",
-    btnGradientEnd: "rgba(13,10,22,0.98)",
-    btnHover: "rgba(80,60,120,0.98)", 
-    actionBtnBg: "rgba(20,15,35,0.95)",
-    themeOptionBg: "rgba(20,15,35,0.4)",
-    glowSoft: "rgba(177,156,217,0.2)", 
-    glowMedium: "rgba(177,156,217,0.4)", 
-    glowStrong: "rgba(177,156,217,0.7)",
-    cardGlowOverlay: "rgba(177,156,217,0.02)"
-  },
-  neon: { 
-    name: "Neon Lime", 
-    bg: "#081102", 
-    cardBg: "#142406", 
-    cardGradientStart: "rgba(20,45,9,0.95)",
-    cardGradientEnd: "rgba(8,18,2,0.98)",
-    accent: "#b8ff00", 
-    text: "#f4ffe6", 
-    border: "#3a5119", 
-    popupBg: "rgba(8,18,2,0.98)", 
-    btnGradientStart: "rgba(15,35,7,0.95)",
-    btnGradientEnd: "rgba(8,18,2,0.98)",
-    btnHover: "rgba(80,120,20,0.98)", 
-    actionBtnBg: "rgba(15,35,7,0.95)",
-    themeOptionBg: "rgba(15,35,7,0.4)",
-    glowSoft: "rgba(184,255,0,0.2)", 
-    glowMedium: "rgba(184,255,0,0.4)", 
-    glowStrong: "rgba(184,255,0,0.7)",
-    cardGlowOverlay: "rgba(184,255,0,0.02)"
-  },
-  magenta: { 
-    name: "Deep Magenta", 
-    bg: "#110209", 
-    cardBg: "#240616", 
-    cardGradientStart: "rgba(45,9,28,0.95)",
-    cardGradientEnd: "rgba(18,2,10,0.98)",
-    accent: "#d63384", 
-    text: "#ffe6f0", 
-    border: "#511935", 
-    popupBg: "rgba(18,2,10,0.98)", 
-    btnGradientStart: "rgba(35,7,22,0.95)",
-    btnGradientEnd: "rgba(20,2,13,0.98)",
-    btnHover: "rgba(120,20,70,0.98)", 
-    actionBtnBg: "rgba(35,7,22,0.95)",
-    themeOptionBg: "rgba(35,7,22,0.4)",
-    glowSoft: "rgba(214,51,132,0.2)", 
-    glowMedium: "rgba(214,51,132,0.4)", 
-    glowStrong: "rgba(214,51,132,0.7)",
-    cardGlowOverlay: "rgba(214,51,132,0.02)"
-  },
-  arctic: { 
-    name: "Arctic Blue", 
-    bg: "#020911", 
-    cardBg: "#061a24", 
-    cardGradientStart: "rgba(9,35,45,0.95)",
-    cardGradientEnd: "rgba(2,10,18,0.98)",
-    accent: "#7dd3fc", 
-    text: "#e6f7ff", 
-    border: "#193551", 
-    popupBg: "rgba(2,10,18,0.98)", 
-    btnGradientStart: "rgba(7,28,35,0.95)",
-    btnGradientEnd: "rgba(2,13,20,0.98)",
-    btnHover: "rgba(20,70,120,0.98)", 
-    actionBtnBg: "rgba(7,28,35,0.95)",
-    themeOptionBg: "rgba(7,28,35,0.4)",
-    glowSoft: "rgba(125,211,252,0.2)", 
-    glowMedium: "rgba(125,211,252,0.4)", 
-    glowStrong: "rgba(125,211,252,0.7)",
-    cardGlowOverlay: "rgba(125,211,252,0.02)"
-  }
-};
+<div class="card">
+<div class="platform-name">DailyMotion</div>
+<div class="platform-type">Video Sharing</div>
+<a class="go-btn" href="https://dailymotion.com" target="_blank">Go To</a>
+</div>
 
-const track = document.getElementById('carouselTrack');
-const container = document.getElementById('carouselContainer');
-const emailModal = document.getElementById('emailModal');
-const emailModalClose = document.getElementById('emailModalClose');
-const copyEmailBtn = document.getElementById('copyEmail');
-const directEmailBtn = document.getElementById('directEmail');
-const emailDisplay = document.getElementById('emailDisplay');
-const copyFeedback = document.getElementById('copyFeedback');
-const seeAllModal = document.getElementById('seeAllModal');
-const seeAllModalClose = document.getElementById('seeAllModalClose');
-const seeAllGrid = document.getElementById('seeAllGrid');
-const aboutModal = document.getElementById('aboutModal');
-const aboutModalClose = document.getElementById('aboutModalClose');
-const aboutContactBtn = document.getElementById('aboutContactBtn');
-const themeOverlay = document.getElementById('themeOverlay');
-const CREATOR_EMAIL = "olusolaayodeji5112@gmail.com";
-let currentTheme = 'emerald';
-let selectedTheme = null;
-let themeResumeTimeout = null;
-let isThemeDropdownOpen = false;
+<div class="card">
+<div class="platform-name">Playeur</div>
+<div class="platform-type">Video Platform</div>
+<a class="go-btn" href="https://playeur.com" target="_blank">Go To</a>
+</div>
 
-// === BUILD CAROUSEL ===
-function buildCarousel() {
-  track.innerHTML = '';
-  socialMedia.forEach(item => {
-    const card = createSocialCard(item.name, item.url, false);
-    track.appendChild(card);
-  });
-  const verifyCard = createVerificationCard();
-  track.appendChild(verifyCard);
-}
+<div class="card">
+<div class="platform-name">Brighteon</div>
+<div class="platform-type">Video Platform</div>
+<a class="go-btn" href="https://brighteon.com" target="_blank">Go To</a>
+</div>
 
-// Create standard social card
-function createSocialCard(name, url, isVerify = false) {
-  const card = document.createElement('div');
-  card.className = 'social-card';
-  card.dataset.type = isVerify ? 'verification' : 'social';
-  
-  card.innerHTML = `
-    <h1 class="social-title">${name}</h1>
-    <a href="${url}" target="_blank" rel="noopener noreferrer" class="social-btn">
-      Visit ${name} →
-    </a>
-    <div class="card-actions" id="cardActions">
-      <button class="action-btn email-btn" title="Contact Creator">✉️ Email Us</button>
-      <button class="action-btn see-all-btn" title="See All Platforms">📋 See All</button>
-      <button class="action-btn about-btn" title="About & Verification">ℹ️ About</button>
-      <div class="theme-picker-wrapper">
-        <button class="action-btn theme-picker-btn" title="Change Theme">🎨 Themes</button>
-        <div class="theme-dropdown" id="themeDropdown">
-          ${Object.entries(themes).map(([key, theme]) => `
-            <div class="theme-option ${key === currentTheme ? 'active' : ''}" data-theme="${key}" tabindex="0">
-              <div class="theme-swatch" style="background: ${theme.accent}; border-color: ${theme.border}"></div>
-              <span class="theme-name">${theme.name}</span>
-            </div>
-          `).join('')}
-          <div class="theme-actions">
-            <button class="theme-cancel-btn">Cancel</button>
-            <button class="theme-apply-btn">Apply Theme</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  if (isVerify) card.classList.add('checklist-card');
-  return card;
-}
+<div class="card">
+<div class="platform-name">PeerTube.TV</div>
+<div class="platform-type">Federated Video</div>
+<a class="go-btn" href="https://peertube.tv" target="_blank">Go To</a>
+</div>
 
-// Create verification card
-function createVerificationCard() {
-  const card = document.createElement('div');
-  card.className = 'social-card checklist-card';
-  card.dataset.type = 'verification';
-  
-  const checklist = [
-    { check: "✓", title: "Text-Only Usage", desc: "Only official brand names in plain text. No logos or stylized assets." },
-    { check: "✓", title: "Direct Official Links", desc: "Every link points to verified official domains. No redirects." },
-    { check: "✓", title: "Nominative Fair Use", desc: "Names used solely to identify and link. No endorsement implied." },
-    { check: "✓", title: "No Modification", desc: "Brand names spelled exactly as registered (e.g., 'X (Twitter)')." },
-    { check: "✓", title: "No Commercial Claim", desc: "Free directory. No monetization or sponsorship claims." },
-    { check: "✓", title: "Guideline Compliance", desc: "Reviewed against published Brand Guidelines from all platforms." }
-  ];
-  
-  const proofs = [
-    { label: "Meta Brand Resources", url: "https://about.meta.com/brand/resources" },
-    { label: "Google Brand Guidelines", url: "https://about.google/brand-resource-center/" },
-    { label: "X Brand Guidelines", url: "https://about.x.com/en/who-we-are/brand-toolkit" },
-    { label: "TikTok Guidelines", url: "https://www.tiktok.com/legal/brand-guidelines" },
-    { label: "USPTO Fair Use", url: "https://www.uspto.gov/trademarks/basics/nominative-fair-use" }
-  ];
-  
-  const checklistHTML = checklist.map(item => `<div class="checklist-item"><span class="check">${item.check}</span><div class="text"><strong>${item.title}</strong>${item.desc}</div></div>`).join('');
-  const proofsHTML = proofs.map(proof => `<a href="${proof.url}" target="_blank" rel="noopener" class="proof-link">🔗 ${proof.label}</a>`).join('');
-  
-  card.innerHTML = `
-    <div class="verified-badge">100% Verified</div>
-    <h1 class="social-title checklist-title">Brand Usage Compliance</h1>
-    <div class="checklist-grid">${checklistHTML}</div>
-    <div style="text-align:center;margin:20px 0;font-weight:600;color:var(--accent)">Official References:</div>
-    <div class="proof-links">${proofsHTML}</div>
-    <div class="update-note"><strong>🔄 Live Update Policy:</strong> All guidelines monitored quarterly. Updates within 72h of policy changes. Last audit: May 2026.</div>
-    <div class="card-actions" id="cardActions">
-      <button class="action-btn email-btn">✉️ Email Us</button>
-      <button class="action-btn see-all-btn">📋 See All</button>
-      <button class="action-btn about-btn">ℹ️ About</button>
-      <div class="theme-picker-wrapper">
-        <button class="action-btn theme-picker-btn">🎨 Themes</button>
-        <div class="theme-dropdown" id="themeDropdown">
-          ${Object.entries(themes).map(([key, theme]) => `
-            <div class="theme-option ${key === currentTheme ? 'active' : ''}" data-theme="${key}" tabindex="0">
-              <div class="theme-swatch" style="background: ${theme.accent}; border-color: ${theme.border}"></div>
-              <span class="theme-name">${theme.name}</span>
-            </div>
-          `).join('')}
-          <div class="theme-actions">
-            <button class="theme-cancel-btn">Cancel</button>
-            <button class="theme-apply-btn">Apply Theme</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  return card;
-}
+<div class="card">
+<div class="platform-name">Rocfin</div>
+<div class="platform-type">Creator Platform</div>
+<a class="go-btn" href="https://rocfin.com" target="_blank">Go To</a>
+</div>
 
-buildCarousel();
+<div class="card">
+<div class="platform-name">BitChute</div>
+<div class="platform-type">Video Platform</div>
+<a class="go-btn" href="https://bitchute.com" target="_blank">Go To</a>
+</div>
 
-// === ANIMATION SETUP ===
-const cardsPerCopy = socialMedia.length + 1;
-const secondsPerCard = 1.5;
-const totalDuration = cardsPerCopy * secondsPerCard;
-track.style.animationDuration = `${totalDuration}s`;
+<div class="card">
+<div class="platform-name">Clapper</div>
+<div class="platform-type">Short Videos</div>
+<a class="go-btn" href="https://clapperapp.com" target="_blank">Go To</a>
+</div>
 
-// === CRITICAL MOBILE FIX: Prevent carousel movement during interactions ===
-function preventCarouselMovement(e) {
-  // Only apply on mobile devices
-  if (window.innerWidth <= 768) {
-    // Prevent swipe gestures when interacting with interactive elements
-    if (e.target.closest('.social-btn') || 
-        e.target.closest('.action-btn') || 
-        e.target.closest('.theme-option') ||
-        e.target.closest('.theme-apply-btn') ||
-        e.target.closest('.theme-cancel-btn') ||
-        e.target.closest('.modal-btn') ||
-        e.target.closest('.modal-close') ||
-        e.target.closest('.proof-link')) {
-      e.stopPropagation();
-      // Pause animation during interaction
-      if (track.style.animationPlayState !== 'paused') {
-        track.style.animationPlayState = 'paused';
-        // Schedule resume after interaction ends
-        setTimeout(() => {
-          if (!isThemeDropdownOpen && !emailModal.classList.contains('active') && 
-              !seeAllModal.classList.contains('active') && !aboutModal.classList.contains('active')) {
-            track.style.animationPlayState = 'running';
-          }
-        }, 100);
-      }
-    }
-  }
-}
+</div>
+</section>
 
-// Add event listeners to prevent movement on mobile
-document.addEventListener('touchstart', preventCarouselMovement, { passive: false });
-document.addEventListener('mousedown', preventCarouselMovement, { passive: false });
+<!-- PHOTO -->
+<section class="category">
+<h2>Photography & Art Platforms</h2>
 
-// === 3-SECOND AUTO-RESUME (General) ===
-let resumeTimeout = null;
-function pauseAndScheduleResume() {
-  // Don't pause if theme dropdown is open
-  if (isThemeDropdownOpen) return;
-  
-  track.style.animationPlayState = 'paused';
-  clearTimeout(resumeTimeout);
-  resumeTimeout = setTimeout(() => { 
-    if (!isThemeDropdownOpen) {
-      track.style.animationPlayState = 'running'; 
-    }
-  }, 3000);
-}
+<div class="grid">
 
-// Only add these listeners on desktop for normal behavior
-if (window.innerWidth > 768) {
-  container.addEventListener('pointerdown', pauseAndScheduleResume);
-  container.addEventListener('mouseenter', pauseAndScheduleResume);
-  container.addEventListener('wheel', pauseAndScheduleResume);
-  container.addEventListener('mouseleave', () => { 
-    clearTimeout(resumeTimeout); 
-    if (!isThemeDropdownOpen) track.style.animationPlayState = 'running'; 
-  });
-}
+<div class="card">
+<div class="platform-name">Instagram</div>
+<div class="platform-type">Photo Sharing</div>
+<a class="go-btn" href="https://instagram.com" target="_blank">Go To</a>
+</div>
 
-// === SWIPE NAVIGATION (Desktop only) ===
-let touchStartX = 0, touchEndX = 0, isSwiping = false;
-if (window.innerWidth > 768) {
-  container.addEventListener('touchstart', (e) => { 
-    // Don't swipe if interacting with interactive elements
-    if (e.target.closest('.social-btn') || 
-        e.target.closest('.action-btn') || 
-        e.target.closest('.theme-option') ||
-        e.target.closest('.theme-apply-btn') ||
-        e.target.closest('.theme-cancel-btn') ||
-        e.target.closest('.modal-btn') ||
-        e.target.closest('.modal-close') ||
-        e.target.closest('.proof-link')) {
-      return;
-    }
-    
-    touchStartX = e.changedTouches[0].screenX; 
-    isSwiping = true; 
-    pauseAndScheduleResume(); 
-  }, { passive: true });
-  
-  container.addEventListener('touchmove', (e) => { 
-    if(isSwiping) touchEndX = e.changedTouches[0].screenX; 
-  }, { passive: true });
-  
-  container.addEventListener('touchend', () => {
-    if(!isSwiping) return; 
-    isSwiping = false;
-    const diff = touchStartX - touchEndX;
-    if(Math.abs(diff) > 80) {
-      const cardWidth = window.innerWidth;
-      const currentTransform = getComputedStyle(track).transform;
-      let currentX = currentTransform !== 'none' ? new DOMMatrix(currentTransform).m41 : 0;
-      track.style.transition = 'transform 0.4s ease-out';
-      track.style.transform = `translateX(${currentX + (diff > 0 ? -cardWidth : cardWidth)}px)`;
-      setTimeout(() => { 
-        track.style.transition = ''; 
-        if (!isThemeDropdownOpen) track.style.animationPlayState = 'running'; 
-      }, 400);
-    } else { 
-      if (!isThemeDropdownOpen) track.style.animationPlayState = 'running'; 
-    }
-  });
-}
+<div class="card">
+<div class="platform-name">Flickr</div>
+<div class="platform-type">Photography</div>
+<a class="go-btn" href="https://flickr.com" target="_blank">Go To</a>
+</div>
 
-// === SMART DROPDOWN POSITIONING (Desktop only) ===
-function positionDropdown(dropdown) {
-  // Only position on desktop
-  if (window.innerWidth > 768) {
-    const rect = dropdown.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    dropdown.classList.remove('flipped-left', 'flipped-top');
-    
-    if (rect.right > viewportWidth - 10) {
-      dropdown.classList.add('flipped-left');
-    }
-    
-    if (rect.bottom > viewportHeight - 10) {
-      dropdown.classList.add('flipped-top');
-    }
-  }
-  // On mobile, dropdown is always centered with position: fixed
-}
+<div class="card">
+<div class="platform-name">Pexels</div>
+<div class="platform-type">Stock Photos</div>
+<a class="go-btn" href="https://pexels.com" target="_blank">Go To</a>
+</div>
 
-// === THEME DROPDOWN MANAGEMENT ===
-function openThemeDropdown(wrapper) {
-  const dropdown = wrapper.querySelector('.theme-dropdown');
-  
-  // Close all other dropdowns first
-  document.querySelectorAll('.theme-dropdown').forEach(d => {
-    if (d !== dropdown) {
-      d.classList.remove('show');
-      d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-    }
-  });
-  
-  // Show current dropdown
-  dropdown.classList.add('show');
-  
-  // Show overlay on mobile
-  if (window.innerWidth <= 768) {
-    themeOverlay.classList.add('active');
-    isThemeDropdownOpen = true;
-    // Pause animation when dropdown opens
-    track.style.animationPlayState = 'paused';
-  }
-  
-  // Position dropdown smartly on desktop
-  setTimeout(() => positionDropdown(dropdown), 10);
-  
-  // Pre-select current theme visually
-  dropdown.querySelector(`.theme-option[data-theme="${currentTheme}"]`)?.classList.add('selected');
-  selectedTheme = currentTheme;
-}
+<div class="card">
+<div class="platform-name">Sketchfab</div>
+<div class="platform-type">3D Models</div>
+<a class="go-btn" href="https://sketchfab.com" target="_blank">Go To</a>
+</div>
 
-function closeAllThemeDropdowns() {
-  document.querySelectorAll('.theme-dropdown').forEach(d => {
-    d.classList.remove('show');
-    d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-  });
-  
-  // Hide overlay on mobile
-  themeOverlay.classList.remove('active');
-  isThemeDropdownOpen = false;
-  selectedTheme = null;
-  
-  // Resume animation after closing (with delay for smooth transition)
-  setTimeout(() => {
-    if (track.style.animationPlayState === 'paused') {
-      track.style.animationPlayState = 'running';
-    }
-  }, 300);
-}
+<div class="card">
+<div class="platform-name">EyeEm</div>
+<div class="platform-type">Photography</div>
+<a class="go-btn" href="https://eyeem.com" target="_blank">Go To</a>
+</div>
 
-// === CARD CLICK: Show Actions ===
-document.addEventListener('click', (e) => {
-  // Don't close if clicking inside card-actions or theme-dropdown
-  if (e.target.closest('.card-actions') || e.target.closest('.theme-dropdown')) {
-    return;
-  }
-  
-  // Close theme dropdown if clicking on card body
-  const card = e.target.closest('.social-card');
-  if (card && !e.target.closest('.social-btn') && !e.target.closest('.action-btn')) {
-    // Close theme dropdowns when clicking on card body
-    closeAllThemeDropdowns();
-    
-    // Show action buttons
-    card.querySelector('.card-actions')?.classList.add('visible');
-    
-    // On mobile, pause animation briefly when showing actions
-    if (window.innerWidth <= 768) {
-      pauseAndScheduleResume();
-    }
-    return;
-  }
-  
-  // Close theme dropdowns but keep action buttons visible if they were already showing
-  if (!e.target.closest('.theme-picker-wrapper')) {
-    closeAllThemeDropdowns();
-  }
-});
+<div class="card">
+<div class="platform-name">Imgpile</div>
+<div class="platform-type">Image Hosting</div>
+<a class="go-btn" href="https://imgpile.com" target="_blank">Go To</a>
+</div>
 
-// === THEME PICKER: OPEN/CLOSE ===
-document.addEventListener('click', (e) => {
-  // Toggle dropdown on theme button click
-  if (e.target.closest('.theme-picker-btn')) {
-    e.stopPropagation();
-    const wrapper = e.target.closest('.theme-picker-wrapper');
-    const dropdown = wrapper.querySelector('.theme-dropdown');
-    const isVisible = dropdown.classList.contains('show');
-    
-    if (isVisible) {
-      closeAllThemeDropdowns();
-    } else {
-      openThemeDropdown(wrapper);
-    }
-    return;
-  }
-  
-  // Theme option selection (preview only, doesn't apply yet)
-  const option = e.target.closest('.theme-option');
-  if (option && !e.target.closest('.theme-actions')) {
-    e.stopPropagation();
-    const dropdown = option.closest('.theme-dropdown');
-    dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-    option.classList.add('selected');
-    selectedTheme = option.dataset.theme;
-    return;
-  }
-  
-  // Apply button click - CLOSE DROPDOWN AFTER APPLYING
-  if (e.target.closest('.theme-apply-btn')) {
-    e.stopPropagation();
-    if (selectedTheme && themes[selectedTheme]) {
-      applyTheme(selectedTheme);
-      // Close dropdown after apply
-      closeAllThemeDropdowns();
-      
-      // Pause animation, wait 3 seconds, then resume
-      track.style.animationPlayState = 'paused';
-      clearTimeout(themeResumeTimeout);
-      themeResumeTimeout = setTimeout(() => {
-        track.style.animationPlayState = 'running';
-      }, 3000);
-    }
-    return;
-  }
-  
-  // Cancel button click
-  if (e.target.closest('.theme-cancel-btn')) {
-    e.stopPropagation();
-    closeAllThemeDropdowns();
-    track.style.animationPlayState = 'running';
-    return;
-  }
-});
+<div class="card">
+<div class="platform-name">500px</div>
+<div class="platform-type">Photography</div>
+<a class="go-btn" href="https://500px.com" target="_blank">Go To</a>
+</div>
 
-// Close theme dropdown when clicking overlay (mobile)
-themeOverlay.addEventListener('click', () => {
-  closeAllThemeDropdowns();
-  track.style.animationPlayState = 'running';
-});
+<div class="card">
+<div class="platform-name">YouPic</div>
+<div class="platform-type">Photography</div>
+<a class="go-btn" href="https://youpic.com" target="_blank">Go To</a>
+</div>
 
-// === ABOUT MODAL FUNCTIONS ===
-function openAboutModal() { 
-  aboutModal.classList.add('active'); 
-  // Pause animation when modal is open
-  track.style.animationPlayState = 'paused';
-}
-function closeAboutModal() { 
-  aboutModal.classList.remove('active'); 
-  // Resume animation after modal closes
-  setTimeout(() => {
-    if (!isThemeDropdownOpen && !emailModal.classList.contains('active') && !seeAllModal.classList.contains('active')) {
-      track.style.animationPlayState = 'running';
-    }
-  }, 300);
-}
-aboutModalClose.addEventListener('click', closeAboutModal);
-aboutModal.addEventListener('click', (e) => { 
-  if (e.target === aboutModal) closeAboutModal(); 
-});
-aboutContactBtn.addEventListener('click', () => {
-  closeAboutModal();
-  openEmailModal();
-});
+<div class="card">
+<div class="platform-name">Pixelfed</div>
+<div class="platform-type">Federated Photos</div>
+<a class="go-btn" href="https://pixelfed.org" target="_blank">Go To</a>
+</div>
 
-// Handle keyboard navigation
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') { 
-    closeEmailModal(); 
-    closeSeeAllModal(); 
-    closeAboutModal();
-    closeAllThemeDropdowns();
-    track.style.animationPlayState = 'running';
-  }
-  if (e.key === ' ' || e.key === 'Spacebar') { 
-    e.preventDefault(); 
-    track.style.animationPlayState = track.style.animationPlayState === 'paused' ? 'running' : 'paused'; 
-  }
-});
+<div class="card">
+<div class="platform-name">VSCO</div>
+<div class="platform-type">Photography</div>
+<a class="go-btn" href="https://vsco.co" target="_blank">Go To</a>
+</div>
 
-// === APPLY THEME FUNCTION ===
-function applyTheme(themeKey) {
-  const t = themes[themeKey];
-  if (!t) return;
-  currentTheme = themeKey;
-  
-  document.documentElement.style.setProperty('--bg', t.bg);
-  document.documentElement.style.setProperty('--card-bg', t.cardBg);
-  document.documentElement.style.setProperty('--card-gradient-start', t.cardGradientStart);
-  document.documentElement.style.setProperty('--card-gradient-end', t.cardGradientEnd);
-  document.documentElement.style.setProperty('--accent', t.accent);
-  document.documentElement.style.setProperty('--text', t.text);
-  document.documentElement.style.setProperty('--border', t.border);
-  document.documentElement.style.setProperty('--popup-bg', t.popupBg);
-  document.documentElement.style.setProperty('--btn-gradient-start', t.btnGradientStart);
-  document.documentElement.style.setProperty('--btn-gradient-end', t.btnGradientEnd);
-  document.documentElement.style.setProperty('--btn-hover', t.btnHover);
-  document.documentElement.style.setProperty('--action-btn-bg', t.actionBtnBg);
-  document.documentElement.style.setProperty('--theme-option-bg', t.themeOptionBg);
-  document.documentElement.style.setProperty('--glow-soft', t.glowSoft);
-  document.documentElement.style.setProperty('--glow-medium', t.glowMedium);
-  document.documentElement.style.setProperty('--glow-strong', t.glowStrong);
-  document.documentElement.style.setProperty('--card-glow-overlay', t.cardGlowOverlay);
-  
-  document.querySelectorAll('.theme-option').forEach(opt => {
-    opt.classList.toggle('active', opt.dataset.theme === themeKey);
-  });
-  
-  sessionStorage.setItem('savedTheme', themeKey);
-  console.log(`🎨 Theme applied: ${t.name}`);
-}
+<div class="card">
+<div class="platform-name">Cara</div>
+<div class="platform-type">Artist Platform</div>
+<a class="go-btn" href="https://cara.app" target="_blank">Go To</a>
+</div>
 
-// Load saved theme on page load
-const saved = sessionStorage.getItem('savedTheme');
-if (saved && themes[saved]) applyTheme(saved);
+<div class="card">
+<div class="platform-name">Photo.net</div>
+<div class="platform-type">Photography Community</div>
+<a class="go-btn" href="https://photo.net" target="_blank">Go To</a>
+</div>
 
-// Handle window resize for dropdown repositioning
-window.addEventListener('resize', () => {
-  // Re-position dropdowns on desktop when resizing
-  if (window.innerWidth > 768) {
-    document.querySelectorAll('.theme-dropdown.show').forEach(dropdown => {
-      positionDropdown(dropdown);
-    });
-  }
-  
-  // Update mobile/desktop behavior on resize
-  if (window.innerWidth <= 768) {
-    // On mobile, ensure dropdowns are centered
-    document.querySelectorAll('.theme-dropdown').forEach(dropdown => {
-      dropdown.style.position = 'fixed';
-      dropdown.style.top = '50%';
-      dropdown.style.left = '50%';
-      dropdown.style.transform = 'translate(-50%, -50%)';
-    });
-  }
-});
+<div class="card">
+<div class="platform-name">Pixiv</div>
+<div class="platform-type">Illustration Community</div>
+<a class="go-btn" href="https://pixiv.net" target="_blank">Go To</a>
+</div>
 
-// === EMAIL MODAL ===
-function openEmailModal() { 
-  emailModal.classList.add('active'); 
-  copyFeedback.classList.remove('show');
-  // Pause animation when modal is open
-  track.style.animationPlayState = 'paused';
-}
-function closeEmailModal() { 
-  emailModal.classList.remove('active');
-  // Resume animation after modal closes
-  setTimeout(() => {
-    if (!isThemeDropdownOpen && !aboutModal.classList.contains('active') && !seeAllModal.classList.contains('active')) {
-      track.style.animationPlayState = 'running';
-    }
-  }, 300);
-}
-emailModalClose.addEventListener('click', closeEmailModal);
-emailModal.addEventListener('click', (e) => { 
-  if (e.target === emailModal) closeEmailModal(); 
-});
-copyEmailBtn.addEventListener('click', async () => {
-  try { 
-    await navigator.clipboard.writeText(CREATOR_EMAIL); 
-    copyFeedback.classList.add('show'); 
-    setTimeout(() => copyFeedback.classList.remove('show'), 2000); 
-  } catch { 
-    emailDisplay.select(); 
-    document.execCommand('copy'); 
-    copyFeedback.classList.add('show'); 
-    setTimeout(() => copyFeedback.classList.remove('show'), 2000); 
-  }
-});
-directEmailBtn.addEventListener('click', () => { 
-  window.location.href = `mailto:${CREATOR_EMAIL}`; 
-  closeEmailModal(); 
-});
+<div class="card">
+<div class="platform-name">Behance</div>
+<div class="platform-type">Creative Portfolio</div>
+<a class="go-btn" href="https://behance.net" target="_blank">Go To</a>
+</div>
 
-// === SEE ALL MODAL ===
-function buildSeeAllGrid() {
-  seeAllGrid.innerHTML = socialMedia.map(item => 
-    `<div class="see-all-item"><a href="${item.url}" target="_blank" rel="noopener">${item.name}</a></div>`
-  ).join('');
-}
-buildSeeAllGrid();
+<div class="card">
+<div class="platform-name">ArtStation</div>
+<div class="platform-type">Digital Art</div>
+<a class="go-btn" href="https://artstation.com" target="_blank">Go To</a>
+</div>
 
-function openSeeAllModal() { 
-  seeAllModal.classList.add('active');
-  // Pause animation when modal is open
-  track.style.animationPlayState = 'paused';
-}
-function closeSeeAllModal() { 
-  seeAllModal.classList.remove('active');
-  // Resume animation after modal closes
-  setTimeout(() => {
-    if (!isThemeDropdownOpen && !emailModal.classList.contains('active') && !aboutModal.classList.contains('active')) {
-      track.style.animationPlayState = 'running';
-    }
-  }, 300);
-}
-seeAllModalClose.addEventListener('click', closeSeeAllModal);
-seeAllModal.addEventListener('click', (e) => { 
-  if (e.target === seeAllModal) closeSeeAllModal(); 
-});
+<div class="card">
+<div class="platform-name">DeviantArt</div>
+<div class="platform-type">Art Community</div>
+<a class="go-btn" href="https://deviantart.com" target="_blank">Go To</a>
+</div>
 
-// === ACTION BUTTONS ===
-document.addEventListener('click', (e) => {
-  if (e.target.closest('.email-btn')) { openEmailModal(); }
-  if (e.target.closest('.see-all-btn')) { openSeeAllModal(); }
-  if (e.target.closest('.about-btn')) { openAboutModal(); }
-});
+</div>
+</section>
 
-// === TOUCH OPTIMIZATIONS ===
-['touchstart', 'touchmove', 'touchend'].forEach(event => {
-  document.addEventListener(event, () => {}, { passive: true });
-});
+<!-- SOCIAL -->
+<section class="category">
+<h2>Social Networks</h2>
 
-let lastTouchEnd = 0;
-document.addEventListener('touchend', (event) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault();
-  }
-  lastTouchEnd = now;
-}, { passive: false });
+<div class="grid">
 
-// === MOBILE SPECIFIC: Prevent pull-to-refresh and overscroll ===
-document.addEventListener('touchmove', (e) => {
-  // Prevent pull-to-refresh when interacting with modals or dropdowns
-  if (isThemeDropdownOpen || 
-      emailModal.classList.contains('active') || 
-      seeAllModal.classList.contains('active') || 
-      aboutModal.classList.contains('active')) {
-    e.preventDefault();
-  }
-}, { passive: false });
+<div class="card">
+<div class="platform-name">Facebook</div>
+<div class="platform-type">Social Network</div>
+<a class="go-btn" href="https://facebook.com" target="_blank">Go To</a>
+</div>
 
-console.log(`🎠 Carousel: ${cardsPerCopy} cards | ${totalDuration}s | 12 Full-Color Themes`);
-console.log(`✅ Brand Compliance: 100% Verified | About Modal: Active | Last: ${new Date().toLocaleDateString()}`);
-console.log(`📱 Mobile Optimized: Touch targets 44px+ | Smart dropdown | Viewport-aware | Animation paused during interactions`);
-</script>
+<div class="card">
+<div class="platform-name">X (Twitter)</div>
+<div class="platform-type">Microblogging</div>
+<a class="go-btn" href="https://x.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Threads</div>
+<div class="platform-type">Text Social</div>
+<a class="go-btn" href="https://threads.net" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Bluesky</div>
+<div class="platform-type">Decentralized Social</div>
+<a class="go-btn" href="https://bsky.app" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Mastodon</div>
+<div class="platform-type">Federated Social</div>
+<a class="go-btn" href="https://mastodon.social" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Reddit</div>
+<div class="platform-type">Communities</div>
+<a class="go-btn" href="https://reddit.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Pinterest</div>
+<div class="platform-type">Visual Discovery</div>
+<a class="go-btn" href="https://pinterest.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Tumblr</div>
+<div class="platform-type">Blogging</div>
+<a class="go-btn" href="https://tumblr.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Discord</div>
+<div class="platform-type">Community Chat</div>
+<a class="go-btn" href="https://discord.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Telegram</div>
+<div class="platform-type">Messaging</div>
+<a class="go-btn" href="https://telegram.org" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">LINE</div>
+<div class="platform-type">Messaging</div>
+<a class="go-btn" href="https://line.me" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">VK (VKontakte)</div>
+<div class="platform-type">Social Network</div>
+<a class="go-btn" href="https://vk.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Snapchat</div>
+<div class="platform-type">Messaging</div>
+<a class="go-btn" href="https://snapchat.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Quora</div>
+<div class="platform-type">Questions & Answers</div>
+<a class="go-btn" href="https://quora.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Medium</div>
+<div class="platform-type">Publishing</div>
+<a class="go-btn" href="https://medium.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Substack</div>
+<div class="platform-type">Newsletters</div>
+<a class="go-btn" href="https://substack.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Second1st</div>
+<div class="platform-type">Social Platform</div>
+<a class="go-btn" href="#" target="_blank">Go To</a>
+</div>
+
+</div>
+</section>
+
+<!-- CREATOR -->
+<section class="category">
+<h2>Creator & Community Platforms</h2>
+
+<div class="grid">
+
+<div class="card">
+<div class="platform-name">Newgrounds</div>
+<div class="platform-type">Creative Community</div>
+<a class="go-btn" href="https://newgrounds.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Amino</div>
+<div class="platform-type">Communities</div>
+<a class="go-btn" href="https://aminoapps.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">We Heart It</div>
+<div class="platform-type">Visual Inspiration</div>
+<a class="go-btn" href="https://weheartit.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">MeWe</div>
+<div class="platform-type">Social Network</div>
+<a class="go-btn" href="https://mewe.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">SpaceHey</div>
+<div class="platform-type">Retro Social</div>
+<a class="go-btn" href="https://spacehey.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Pillowfort</div>
+<div class="platform-type">Creative Community</div>
+<a class="go-btn" href="https://pillowfort.social" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Steemit</div>
+<div class="platform-type">Blockchain Social</div>
+<a class="go-btn" href="https://steemit.com" target="_blank">Go To</a>
+</div>
+
+<div class="card">
+<div class="platform-name">Lemon8</div>
+<div class="platform-type">Lifestyle Social</div>
+<a class="go-btn" href="https://lemon8-app.com" target="_blank">Go To</a>
+</div>
+
+</div>
+</section>
+
+<footer>
+Universal Plain Text Social Directory • No Logos • Neutral Styling • Trademark Safe Layout
+</footer>
+
 </body>
 </html>
