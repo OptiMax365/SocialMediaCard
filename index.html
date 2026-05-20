@@ -43,6 +43,7 @@ body {
   height: 100vh;
   width: 100vw;
   transition: background 0.4s ease, color 0.4s ease;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* === CAROUSEL CONTAINER === */
@@ -56,6 +57,10 @@ body {
   background: var(--bg);
   touch-action: pan-y;
   transition: background 0.4s ease;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* === SLIDING TRACK === */
@@ -66,6 +71,8 @@ body {
   animation: slideRightToLeft 120s linear infinite;
   will-change: transform;
   transition: transform 0.3s ease-out;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* === EACH CARD - FULL VIEWPORT === */
@@ -83,6 +90,9 @@ body {
   overflow: hidden;
   user-select: none;
   transition: background 0.4s ease, border-color 0.4s ease;
+  pointer-events: auto;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .social-card::before {
@@ -106,6 +116,7 @@ body {
   letter-spacing: -0.02em;
   animation: titlePulse 3s ease-in-out infinite;
   transition: color 0.4s ease, text-shadow 0.4s ease;
+  pointer-events: none;
 }
 
 @keyframes titlePulse {
@@ -140,6 +151,7 @@ body {
   text-align: center;
   user-select: auto;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .social-btn:hover {
@@ -192,6 +204,7 @@ body {
   justify-content: center;
   gap: 8px;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .action-btn:hover {
@@ -205,9 +218,10 @@ body {
   transform: translateX(2px) scale(0.98);
 }
 
-/* Theme Picker Dropdown */
+/* Theme Picker Dropdown - MOBILE OPTIMIZED */
 .theme-picker-wrapper {
   position: relative;
+  z-index: 100;
 }
 
 .theme-picker-btn {
@@ -216,133 +230,172 @@ body {
 }
 
 .theme-dropdown {
-  position: absolute;
-  left: 100%;
-  top: 0;
-  margin-left: 10px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
   background: var(--card-bg);
   border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 15px;
+  border-radius: 20px;
+  padding: 18px;
   display: none;
   flex-direction: column;
-  gap: 10px;
-  min-width: 220px;
-  max-width: 90vw;
-  max-height: 55vh;
+  gap: 12px;
+  min-width: 280px;
+  max-width: 92vw;
+  max-height: 70vh;
   overflow-y: auto;
   overflow-x: hidden;
-  z-index: 1000;
-  box-shadow: 0 0 30px var(--glow-medium);
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease, opacity 0.2s ease;
-  transform-origin: left center;
+  z-index: 9999 !important;
+  box-shadow: 0 0 40px var(--glow-strong), 0 0 80px var(--glow-medium);
+  transition: transform 0.25s ease-out, opacity 0.25s ease-out, background 0.4s ease, border-color 0.4s ease;
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .theme-dropdown.show {
   display: flex;
-  animation: dropdownAppear 0.2s ease-out;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+  animation: dropdownAppearMobile 0.25s ease-out forwards;
 }
 
-@keyframes dropdownAppear {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes dropdownAppearMobile {
+  from { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  to { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
-.theme-dropdown.flipped-left {
-  left: auto;
-  right: 100%;
-  margin-left: 0;
-  margin-right: 10px;
-  transform-origin: right center;
-}
-
-.theme-dropdown.flipped-top {
-  top: auto;
-  bottom: 0;
+/* Desktop positioning (non-mobile) */
+@media (min-width: 769px) {
+  .theme-dropdown {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    margin-left: 12px;
+    transform: none;
+    max-height: 55vh;
+    z-index: 1000 !important;
+  }
+  
+  .theme-dropdown.show {
+    transform: none;
+    animation: dropdownAppear 0.2s ease-out;
+  }
+  
+  @keyframes dropdownAppear {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  .theme-dropdown.flipped-left {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 12px;
+  }
+  
+  .theme-dropdown.flipped-top {
+    top: auto;
+    bottom: 0;
+  }
 }
 
 .theme-option {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 2px solid transparent;
   background: var(--theme-option-bg);
-  min-height: 44px;
+  min-height: 48px;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .theme-option:hover,
 .theme-option.selected {
   border-color: var(--accent);
   background: var(--btn-hover);
-  box-shadow: 0 0 15px var(--glow-medium);
+  box-shadow: 0 0 18px var(--glow-medium);
 }
 
 .theme-option:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 }
 
 .theme-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   border: 2px solid var(--border);
   flex-shrink: 0;
   transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+  box-shadow: 0 0 0 1px var(--glow-soft);
 }
 
 .theme-name {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--text);
   transition: color 0.4s ease;
   flex: 1;
+  font-weight: 500;
 }
 
 .theme-option.active .theme-swatch {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--glow-medium);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px var(--glow-medium);
 }
 
 .theme-option.selected .theme-swatch {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 15px var(--glow-strong);
-  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 18px var(--glow-strong);
+  transform: scale(1.08);
 }
 
 /* Apply & Cancel Buttons */
 .theme-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 12px;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
 }
 
 .theme-apply-btn,
 .theme-cancel-btn {
   flex: 1;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 0.9rem;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: all 0.25s ease;
-  min-height: 44px;
+  min-height: 48px;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .theme-apply-btn {
   background: linear-gradient(90deg, var(--accent), var(--border));
   color: var(--bg);
+  font-weight: 700;
 }
 
 .theme-apply-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 20px var(--glow-medium);
-  filter: brightness(1.1);
+  box-shadow: 0 0 22px var(--glow-medium);
+  filter: brightness(1.08);
 }
 
 .theme-apply-btn:active {
@@ -381,6 +434,7 @@ body {
   box-shadow: 0 0 20px var(--glow-medium);
   z-index: 3;
   transition: background 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+  pointer-events: none;
 }
 
 .verified-badge::before {
@@ -402,6 +456,7 @@ body {
   margin-bottom: 30px;
   text-shadow: 0 0 20px var(--glow-strong);
   transition: color 0.4s ease, text-shadow 0.4s ease;
+  pointer-events: none;
 }
 
 .checklist-grid {
@@ -464,6 +519,7 @@ body {
   min-height: 36px;
   display: inline-flex;
   align-items: center;
+  pointer-events: auto;
 }
 
 .proof-link:hover {
@@ -499,11 +555,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 5000 !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .modal-overlay.active {
@@ -524,6 +581,7 @@ body {
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   max-height: 90vh;
   overflow-y: auto;
+  z-index: 5001 !important;
 }
 
 .modal-close {
@@ -543,6 +601,8 @@ body {
   align-items: center;
   justify-content: center;
   touch-action: manipulation;
+  z-index: 5002;
+  pointer-events: auto;
 }
 
 .modal-close:hover { opacity: 1; color: var(--accent); }
@@ -554,6 +614,7 @@ body {
   margin-bottom: 25px;
   text-shadow: 0 0 15px var(--glow-strong);
   transition: color 0.4s ease, text-shadow 0.4s ease;
+  pointer-events: none;
 }
 
 /* === ABOUT MODAL SPECIFIC STYLES === */
@@ -581,6 +642,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  pointer-events: none;
 }
 
 .about-section p {
@@ -669,6 +731,7 @@ body {
   gap: 10px;
   min-height: 48px;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .modal-btn.copy {
@@ -711,6 +774,7 @@ body {
   min-height: 20px;
   opacity: 0;
   transition: opacity 0.3s, color 0.4s ease;
+  pointer-events: none;
 }
 
 .copy-feedback.show { opacity: 1; }
@@ -736,6 +800,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
 
 .see-all-item:hover {
@@ -756,6 +821,7 @@ body {
   font-size: 1rem;
   display: block;
   transition: color 0.4s ease;
+  pointer-events: auto;
 }
 
 .see-all-item a:hover {
@@ -791,39 +857,29 @@ body {
 
 /* === MOBILE OPTIMIZATIONS === */
 @media (max-width: 768px) {
-  .social-title { font-size: clamp(2.5rem, 8vw, 4rem); margin-bottom: 40px; }
+  .social-title { 
+    font-size: clamp(2.5rem, 8vw, 4rem); 
+    margin-bottom: 40px; 
+    pointer-events: none;
+  }
+  
   .social-btn { 
     padding: 18px 40px; 
     font-size: 1.2rem; 
     min-width: 260px;
     min-height: 56px;
   }
+  
   .card-actions { 
     left: 15px;
     gap: 10px;
   }
+  
   .action-btn { 
     padding: 10px 16px; 
     font-size: 0.95rem; 
     min-width: 120px;
     min-height: 48px;
-  }
-  
-  .theme-dropdown {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0;
-    width: 90vw;
-    max-height: 65vh;
-  }
-  
-  .theme-dropdown.flipped-left,
-  .theme-dropdown.flipped-top {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0;
   }
   
   .checklist-card { padding: 20px 15px; }
@@ -853,6 +909,23 @@ body {
     border-color: var(--accent);
     opacity: 1;
   }
+  
+  /* Mobile: Theme dropdown is always centered, fixed position */
+  .theme-dropdown {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0.95) !important;
+    margin: 0 !important;
+    width: auto !important;
+    max-width: 92vw !important;
+    max-height: 70vh !important;
+    z-index: 9999 !important;
+  }
+  
+  .theme-dropdown.show {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -860,21 +933,25 @@ body {
   .social-btn { min-width: 240px; padding: 16px 32px; font-size: 1.1rem; }
   .action-btn { min-width: 110px; font-size: 0.9rem; padding: 10px 14px; }
   .theme-option { padding: 12px 14px; font-size: 0.9rem; }
-  .theme-swatch { width: 24px; height: 24px; }
+  .theme-swatch { width: 26px; height: 26px; }
+  .theme-name { font-size: 0.95rem; }
 }
 
 /* Hide scrollbar but keep functionality */
 .carousel-container::-webkit-scrollbar { display: none; }
 .carousel-container { -ms-overflow-style: none; scrollbar-width: none; }
 .see-all-grid::-webkit-scrollbar,
-.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar,
+.theme-dropdown::-webkit-scrollbar { width: 6px; }
 .see-all-grid::-webkit-scrollbar-thumb,
-.modal-content::-webkit-scrollbar-thumb { 
+.modal-content::-webkit-scrollbar-thumb,
+.theme-dropdown::-webkit-scrollbar-thumb { 
   background: var(--border); 
   border-radius: 3px;
 }
 .see-all-grid::-webkit-scrollbar-track,
-.modal-content::-webkit-scrollbar-track { background: transparent; }
+.modal-content::-webkit-scrollbar-track,
+.theme-dropdown::-webkit-scrollbar-track { background: transparent; }
 
 /* Prevent text selection on interactive elements */
 .social-card { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
@@ -893,6 +970,17 @@ body {
 .modal-close:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Prevent scroll bounce on mobile */
+body {
+  overscroll-behavior: none;
+  -webkit-overscroll-behavior: none;
+}
+
+/* Ensure dropdown is always on top */
+.theme-dropdown {
+  isolation: isolate;
 }
 </style>
 </head>
@@ -1344,6 +1432,7 @@ const CREATOR_EMAIL = "olusolaayodeji5112@gmail.com";
 let currentTheme = 'emerald';
 let selectedTheme = null;
 let themeResumeTimeout = null;
+let isDropdownOpen = false;
 
 // === BUILD CAROUSEL ===
 function buildCarousel() {
@@ -1361,6 +1450,13 @@ function createSocialCard(name, url, isVerify = false) {
   const card = document.createElement('div');
   card.className = 'social-card';
   card.dataset.type = isVerify ? 'verification' : 'social';
+  
+  // Prevent card touch from triggering scroll on mobile
+  card.addEventListener('touchstart', (e) => {
+    if (!e.target.closest('.social-btn') && !e.target.closest('.action-btn') && !e.target.closest('.theme-dropdown')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
   
   card.innerHTML = `
     <h1 class="social-title">${name}</h1>
@@ -1397,6 +1493,13 @@ function createVerificationCard() {
   const card = document.createElement('div');
   card.className = 'social-card checklist-card';
   card.dataset.type = 'verification';
+  
+  // Prevent card touch from triggering scroll on mobile
+  card.addEventListener('touchstart', (e) => {
+    if (!e.target.closest('.social-btn') && !e.target.closest('.action-btn') && !e.target.closest('.theme-dropdown')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
   
   const checklist = [
     { check: "✓", title: "Text-Only Usage", desc: "Only official brand names in plain text. No logos or stylized assets." },
@@ -1460,28 +1563,51 @@ track.style.animationDuration = `${totalDuration}s`;
 // === 3-SECOND AUTO-RESUME (General) ===
 let resumeTimeout = null;
 function pauseAndScheduleResume() {
+  if (isDropdownOpen) return; // Don't resume if dropdown is open
   track.style.animationPlayState = 'paused';
   clearTimeout(resumeTimeout);
-  resumeTimeout = setTimeout(() => { track.style.animationPlayState = 'running'; }, 3000);
+  resumeTimeout = setTimeout(() => { 
+    if (!isDropdownOpen) track.style.animationPlayState = 'running'; 
+  }, 3000);
 }
 container.addEventListener('pointerdown', pauseAndScheduleResume);
 container.addEventListener('mouseenter', pauseAndScheduleResume);
 container.addEventListener('wheel', pauseAndScheduleResume);
-container.addEventListener('touchstart', pauseAndScheduleResume, { passive: true });
-container.addEventListener('mouseleave', () => { clearTimeout(resumeTimeout); track.style.animationPlayState = 'running'; });
+container.addEventListener('touchstart', (e) => {
+  // Only pause if not interacting with dropdown
+  if (!e.target.closest('.theme-dropdown')) {
+    pauseAndScheduleResume();
+  }
+}, { passive: true });
+container.addEventListener('mouseleave', () => { 
+  if (!isDropdownOpen) {
+    clearTimeout(resumeTimeout); 
+    track.style.animationPlayState = 'running'; 
+  }
+});
 
 // === SWIPE NAVIGATION ===
 let touchStartX = 0, touchEndX = 0, isSwiping = false;
 container.addEventListener('touchstart', (e) => { 
+  // Don't swipe if dropdown is open
+  if (isDropdownOpen || e.target.closest('.theme-dropdown')) {
+    e.preventDefault();
+    return;
+  }
   touchStartX = e.changedTouches[0].screenX; 
   isSwiping = true; 
   pauseAndScheduleResume(); 
-}, { passive: true });
+}, { passive: false });
+
 container.addEventListener('touchmove', (e) => { 
-  if(isSwiping) touchEndX = e.changedTouches[0].screenX; 
+  if(isSwiping && !isDropdownOpen) touchEndX = e.changedTouches[0].screenX; 
 }, { passive: true });
+
 container.addEventListener('touchend', () => {
-  if(!isSwiping) return; 
+  if(!isSwiping || isDropdownOpen) { 
+    isSwiping = false;
+    return; 
+  }
   isSwiping = false;
   const diff = touchStartX - touchEndX;
   if(Math.abs(diff) > 80) {
@@ -1492,70 +1618,70 @@ container.addEventListener('touchend', () => {
     track.style.transform = `translateX(${currentX + (diff > 0 ? -cardWidth : cardWidth)}px)`;
     setTimeout(() => { 
       track.style.transition = ''; 
-      track.style.animationPlayState = 'running'; 
+      if (!isDropdownOpen) track.style.animationPlayState = 'running'; 
     }, 400);
   } else { 
-    track.style.animationPlayState = 'running'; 
+    if (!isDropdownOpen) track.style.animationPlayState = 'running'; 
   }
 });
 
-// === SMART DROPDOWN POSITIONING ===
-function positionDropdown(dropdown) {
-  const rect = dropdown.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+// === THEME PICKER: OPEN/CLOSE ===
+function openThemeDropdown(wrapper) {
+  const dropdown = wrapper.querySelector('.theme-dropdown');
   
-  dropdown.classList.remove('flipped-left', 'flipped-top');
-  
-  if (rect.right > viewportWidth - 10) {
-    dropdown.classList.add('flipped-left');
-  }
-  
-  if (rect.bottom > viewportHeight - 10) {
-    dropdown.classList.add('flipped-top');
-  }
-  
-  if (window.innerWidth <= 768) {
-    dropdown.classList.remove('flipped-left', 'flipped-top');
-  }
-}
-
-// === CARD CLICK: Show Actions ===
-document.addEventListener('click', (e) => {
-  // Don't close if clicking inside card-actions or theme-dropdown
-  if (e.target.closest('.card-actions') || e.target.closest('.theme-dropdown')) {
-    return;
-  }
-  
-  // Close all dropdowns when clicking on card body
-  const card = e.target.closest('.social-card');
-  if (card && !e.target.closest('.social-btn') && !e.target.closest('.action-btn')) {
-    // Close theme dropdowns when clicking on card body
-    document.querySelectorAll('.theme-dropdown').forEach(d => {
+  // Close all other dropdowns first
+  document.querySelectorAll('.theme-dropdown').forEach(d => {
+    if (d !== dropdown) {
       d.classList.remove('show');
       d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-    });
-    selectedTheme = null;
-    
-    card.querySelector('.card-actions')?.classList.add('visible');
-    pauseAndScheduleResume();
-    return;
-  }
+    }
+  });
   
-  // Close all dropdowns but keep action buttons visible if they were already showing
+  // Pause animation and mark dropdown as open
+  track.style.animationPlayState = 'paused';
+  isDropdownOpen = true;
+  
+  // Toggle current dropdown
+  dropdown.classList.add('show');
+  
+  // Pre-select current theme visually
+  dropdown.querySelector(`.theme-option[data-theme="${currentTheme}"]`)?.classList.add('selected');
+  selectedTheme = currentTheme;
+  
+  // Ensure dropdown is within viewport (mobile safeguard)
+  setTimeout(() => {
+    if (window.innerWidth <= 768) {
+      const rect = dropdown.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // If dropdown is too tall, constrain it
+      if (rect.height > viewportHeight * 0.7) {
+        dropdown.style.maxHeight = `${viewportHeight * 0.7}px`;
+      }
+    }
+  }, 10);
+}
+
+function closeAllThemeDropdowns(immediateResume = false) {
   document.querySelectorAll('.theme-dropdown').forEach(d => {
     d.classList.remove('show');
     d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
   });
   selectedTheme = null;
+  isDropdownOpen = false;
   
+  if (immediateResume) {
+    track.style.animationPlayState = 'running';
+  } else {
+    // Resume after 3 second delay (consistent with original behavior)
+    clearTimeout(themeResumeTimeout);
+    themeResumeTimeout = setTimeout(() => {
+      track.style.animationPlayState = 'running';
+    }, 3000);
+  }
+}
 
-
-
-
-});
-
-// === THEME PICKER: OPEN/CLOSE ===
+// Global click handler for theme interactions
 document.addEventListener('click', (e) => {
   // Toggle dropdown on theme button click
   if (e.target.closest('.theme-picker-btn')) {
@@ -1564,28 +1690,11 @@ document.addEventListener('click', (e) => {
     const dropdown = wrapper.querySelector('.theme-dropdown');
     const isVisible = dropdown.classList.contains('show');
     
-    // Close all other dropdowns first
-    document.querySelectorAll('.theme-dropdown').forEach(d => {
-      if (d !== dropdown) {
-        d.classList.remove('show');
-        d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-      }
-    });
-    
-    // Toggle current dropdown
     if (isVisible) {
-      dropdown.classList.remove('show');
-      dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-      selectedTheme = null;
+      closeAllThemeDropdowns(true);
     } else {
-      dropdown.classList.add('show');
-      // Position dropdown smartly
-      setTimeout(() => positionDropdown(dropdown), 10);
-      // Pre-select current theme visually
-      dropdown.querySelector(`.theme-option[data-theme="${currentTheme}"]`)?.classList.add('selected');
-      selectedTheme = currentTheme;
+      openThemeDropdown(wrapper);
     }
-    pauseAndScheduleResume();
     return;
   }
   
@@ -1600,22 +1709,12 @@ document.addEventListener('click', (e) => {
     return;
   }
   
-  // Apply button click - CLOSE DROPDOWN AFTER APPLYING
+  // Apply button click
   if (e.target.closest('.theme-apply-btn')) {
     e.stopPropagation();
     if (selectedTheme && themes[selectedTheme]) {
       applyTheme(selectedTheme);
-      // Close dropdown after apply
-      const dropdown = e.target.closest('.theme-dropdown');
-      dropdown.classList.remove('show');
-      dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-      selectedTheme = null;
-      // Pause animation, wait 3 seconds, then resume
-      track.style.animationPlayState = 'paused';
-      clearTimeout(themeResumeTimeout);
-      themeResumeTimeout = setTimeout(() => {
-        track.style.animationPlayState = 'running';
-      }, 3000);
+      closeAllThemeDropdowns(true); // Close and resume immediately after apply
     }
     return;
   }
@@ -1623,21 +1722,30 @@ document.addEventListener('click', (e) => {
   // Cancel button click
   if (e.target.closest('.theme-cancel-btn')) {
     e.stopPropagation();
-    const dropdown = e.target.closest('.theme-dropdown');
-    dropdown.classList.remove('show');
-    dropdown.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-    selectedTheme = null;
-    track.style.animationPlayState = 'running';
+    closeAllThemeDropdowns(true);
     return;
   }
   
-  // Close dropdown if clicking outside theme-picker-wrapper
-  if (!e.target.closest('.theme-picker-wrapper')) {
-    document.querySelectorAll('.theme-dropdown').forEach(d => {
-      d.classList.remove('show');
-      d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-    });
-    selectedTheme = null;
+  // Close dropdown if clicking on card body (but not on interactive elements)
+  const card = e.target.closest('.social-card');
+  if (card && !e.target.closest('.social-btn') && !e.target.closest('.action-btn') && !e.target.closest('.theme-picker-wrapper')) {
+    // Show action buttons
+    card.querySelector('.card-actions')?.classList.add('visible');
+    
+    // Close any open theme dropdowns
+    if (isDropdownOpen) {
+      closeAllThemeDropdowns(true);
+    }
+    
+    pauseAndScheduleResume();
+    return;
+  }
+  
+  // Close dropdown if clicking completely outside any card/dropdown
+  if (!e.target.closest('.social-card') && !e.target.closest('.theme-picker-wrapper')) {
+    if (isDropdownOpen) {
+      closeAllThemeDropdowns(true);
+    }
   }
 });
 
@@ -1663,15 +1771,15 @@ document.addEventListener('keydown', (e) => {
     closeEmailModal(); 
     closeSeeAllModal(); 
     closeAboutModal();
-    document.querySelectorAll('.theme-dropdown').forEach(d => {
-      d.classList.remove('show');
-      d.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
-    });
-    selectedTheme = null; 
+    if (isDropdownOpen) {
+      closeAllThemeDropdowns(true);
+    }
   }
   if (e.key === ' ' || e.key === 'Spacebar') { 
     e.preventDefault(); 
-    track.style.animationPlayState = track.style.animationPlayState === 'paused' ? 'running' : 'paused'; 
+    if (!isDropdownOpen) {
+      track.style.animationPlayState = track.style.animationPlayState === 'paused' ? 'running' : 'paused'; 
+    }
   }
 });
 
@@ -1713,9 +1821,18 @@ if (saved && themes[saved]) applyTheme(saved);
 
 // Handle window resize for dropdown repositioning
 window.addEventListener('resize', () => {
-  document.querySelectorAll('.theme-dropdown.show').forEach(dropdown => {
-    positionDropdown(dropdown);
-  });
+  if (isDropdownOpen) {
+    document.querySelectorAll('.theme-dropdown.show').forEach(dropdown => {
+      if (window.innerWidth <= 768) {
+        const viewportHeight = window.innerHeight;
+        if (dropdown.scrollHeight > viewportHeight * 0.7) {
+          dropdown.style.maxHeight = `${viewportHeight * 0.7}px`;
+        } else {
+          dropdown.style.maxHeight = '70vh';
+        }
+      }
+    });
+  }
 });
 
 // === EMAIL MODAL ===
@@ -1764,9 +1881,18 @@ seeAllModal.addEventListener('click', (e) => {
 
 // === ACTION BUTTONS ===
 document.addEventListener('click', (e) => {
-  if (e.target.closest('.email-btn')) { openEmailModal(); }
-  if (e.target.closest('.see-all-btn')) { openSeeAllModal(); }
-  if (e.target.closest('.about-btn')) { openAboutModal(); }
+  if (e.target.closest('.email-btn')) { 
+    if (isDropdownOpen) closeAllThemeDropdowns(true);
+    openEmailModal(); 
+  }
+  if (e.target.closest('.see-all-btn')) { 
+    if (isDropdownOpen) closeAllThemeDropdowns(true);
+    openSeeAllModal(); 
+  }
+  if (e.target.closest('.about-btn')) { 
+    if (isDropdownOpen) closeAllThemeDropdowns(true);
+    openAboutModal(); 
+  }
 });
 
 // === TOUCH OPTIMIZATIONS ===
@@ -1783,9 +1909,16 @@ document.addEventListener('touchend', (event) => {
   lastTouchEnd = now;
 }, { passive: false });
 
+// === MOBILE: Prevent scroll when interacting with dropdown ===
+document.querySelectorAll('.theme-dropdown').forEach(dropdown => {
+  dropdown.addEventListener('touchmove', (e) => {
+    e.stopPropagation();
+  }, { passive: false });
+});
+
 console.log(`🎠 Carousel: ${cardsPerCopy} cards | ${totalDuration}s | 12 Full-Color Themes`);
 console.log(`✅ Brand Compliance: 100% Verified | About Modal: Active | Last: ${new Date().toLocaleDateString()}`);
-console.log(`📱 Mobile Optimized: Touch targets 44px+ | Smart dropdown | Viewport-aware`);
+console.log(`📱 Mobile Optimized: Touch targets 44px+ | Smart dropdown | Viewport-aware | Animation paused during selection`);
 </script>
 </body>
 </html>
